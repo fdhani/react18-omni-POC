@@ -14,6 +14,11 @@ really painted — but it is identical under `createRoot` and under the legacy
 
 A separate and worse problem *was* found in `StrictMode`.
 
+Also included: a **dependency-stack smoke test** for a wider set of at-risk
+libraries (MUI v4, react-redux, react-hook-form, react-virtualized, and more)
+under this same React 18.3.1 setup — `?cell=3&libs=1`. See
+[DEPENDENCY-STACK.md](./DEPENDENCY-STACK.md).
+
 ## Test matrix
 
 All cells are React 18.3.1. **Cell 2 is the control**: React 18 running the
@@ -149,3 +154,22 @@ Swap `pathB=1` for `pathB=0` to test Path A (resize) instead, and append
 `evidence/` holds the distilled analyses, run logs and confirmation videos.
 Raw per-frame dumps and DevTools traces are gitignored (1.5–12 MB each);
 regenerate them with `npm run measure` and `node harness/trace.mjs 3`.
+
+## Dependency-stack smoke test
+
+`src/libtests/` mounts a dummy page per library (`LibSmokeTest.tsx`, reached
+via `?libs=1`) under the same `?cell=2|3|4` root-API matrix. Each demo is
+wrapped in its own error boundary (`ErrorBoundary.tsx`) so one crash doesn't
+hide the others, and mount/unmount counts + free-form notes land on
+`window.__libResults` for automated inspection.
+
+```bash
+npm run libcheck        # node harness/libcheck.mjs prod -- production build, all 3 cells
+node harness/libcheck.mjs dev   # dev build, to see React's dev-only warnings
+```
+
+See [DEPENDENCY-STACK.md](./DEPENDENCY-STACK.md) for what was tested and what
+was found — short version: nothing crashes under React 18, but
+`react-virtualized` needs a Vite alias workaround (unrelated to React
+version) and `react-hook-form@6`'s types don't resolve under modern
+`moduleResolution: bundler`.

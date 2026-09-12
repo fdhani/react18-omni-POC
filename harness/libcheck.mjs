@@ -64,7 +64,31 @@ for (const cell of CELLS) {
   await page.goto(`http://localhost:${PORT}/?cell=${cell}&libs=1`, { waitUntil: 'load' });
   await page.waitForTimeout(3000); // let the redux tear-probe and effects settle
 
+  // Exercises JSS's *dynamic* class-composition path (the '&$active' rule in
+  // MuiThemeDemo), not just the static theme overrides checked at mount --
+  // a real click, not merely reading initial computed styles.
+  // Close the theme demo's Modal first -- it starts open (so the
+  // MuiBackdrop override check above can run at mount) and its full-viewport
+  // backdrop would otherwise intercept this click.
+  await page.click('.MuiBackdrop-root', { timeout: 5000 }).catch(() => {});
+  await page.waitForTimeout(200);
+  const jssBefore = await page.evaluate(() => {
+    const el = document.querySelector('[data-check="jss-conditional"]');
+    return el ? getComputedStyle(el).borderWidth : null;
+  });
+  await page.click('[data-check="jss-conditional"]', { timeout: 5000 }).catch(() => {});
+  await page.waitForTimeout(200);
+  const jssAfter = await page.evaluate(() => {
+    const el = document.querySelector('[data-check="jss-conditional"]');
+    return el ? getComputedStyle(el).borderWidth : null;
+  });
+
   const results = await page.evaluate(() => window.__libResults ?? {});
+  if (results['mui-theme']) {
+    results['mui-theme'].notes.push(
+      `JSS dynamic $ conditional after click: borderWidth ${jssBefore} -> ${jssAfter} (expect a change)`,
+    );
+  }
   const mode = await page.evaluate(() => window.__MODE__ ?? '?');
   const reactVersion = await page.evaluate(() => window.__REACT_VERSION__ ?? '?');
   const bodyText = await page.evaluate(() => document.body.innerText.slice(0, 200));

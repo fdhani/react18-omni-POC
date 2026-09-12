@@ -11,6 +11,26 @@
         "unmounts": 0,
         "notes": []
       },
+      "mui-theme": {
+        "name": "mui-theme",
+        "status": "ok",
+        "mounts": 1,
+        "unmounts": 0,
+        "notes": [
+          "ok MuiAlert override: expected #123456 (rgb(18, 52, 86)) got=rgb(18, 52, 86)",
+          "ok MuiAutocomplete override: expected #00aa55 (rgb(0, 170, 85)) got=rgb(0, 170, 85)",
+          "ok MuiPaper override: expected #fef3e0 (rgb(254, 243, 224)) got=rgb(254, 243, 224)",
+          "ok MuiTooltip override: expected #2d0033 (rgb(45, 0, 51)) got=rgb(45, 0, 51)",
+          "ok MuiAvatar override: expected #004488 (rgb(0, 68, 136)) got=rgb(0, 68, 136)",
+          "ok MuiLinearProgress override: expected #cc0066 (rgb(204, 0, 102)) got=rgb(204, 0, 102)",
+          "ok MuiBackdrop (Modal) override: expected rgba(10, 20, 30, 0.85) (rgba(10, 20, 30, 0.85)) got=rgba(10, 20, 30, 0.85)",
+          "ok MuiStepper override: expected #f0f8ff (rgb(240, 248, 255)) got=rgb(240, 248, 255)",
+          "theme.palette.primary applied to button: rgb(26, 43, 60)",
+          "JSS <style data-jss> sheets: 58",
+          "JSS duplicate sheets (same data-meta more than once): [[\"MuiTouchRipple\",2],[\"MuiButtonBase\",2],[\"MuiFormLabel\",2],[\"MuiInputLabel\",2],[\"MuiInputBase\",2],[\"MuiSvgIcon\",2],[\"MuiFormControl\",2],[\"MuiTextField\",2],[\"MuiDialog\",2],[\"MuiTooltip\",2],[\"makeStyles\",3],[\"MuiIconButton\",2],[\"MuiAutocomplete\",2],[\"MuiPickersModal\",2]]",
+          "JSS dynamic $ conditional after click: borderWidth 4px -> 2px (expect a change)"
+        ]
+      },
       "mui-lab": {
         "name": "mui-lab",
         "status": "ok",
@@ -31,7 +51,7 @@
         "mounts": 1,
         "unmounts": 0,
         "notes": [
-          "frames observed: 151",
+          "frames observed: 150",
           "torn frames (readers disagreed): 0",
           "final counter value: 401"
         ]
@@ -55,17 +75,27 @@
         ]
       }
     },
-    "consoleErrorCount": 4,
+    "consoleErrorCount": 14,
     "consoleWarningCount": 0,
     "pageErrors": [],
     "consoleErrors": [
+      "error: Material-UI: the createMuiTheme function was renamed to createTheme.\n\nYou should use `import { createTheme } from '@material-ui/core/styles'`",
       "error: Warning: ReactDOM.render is no longer supported in React 18. Use createRoot instead. Until you switch to the new API, your app will behave as if it's running React 17. Learn more: https://reactjs.org/link/switch-to-createroot",
-      "error: Warning: %s: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.%s PickerWithState \n    at PickerWithState (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.js?v=4457eb41:2915:38)\n    at div\n    at MuiPickersUtilsProvider2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.",
-      "error: Warning: %s: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.%s ModalWrapper2 \n    at ModalWrapper2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.js?v=4457eb41:396:20)\n    at Wrapper2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.js?v=4457eb41:474:23)\n    at Pic",
-      "error: Warning: findDOMNode is deprecated and will be removed in the next major release. Instead, add a ref directly to the element you want to reference. Learn more about using refs safely here: https://reactjs.org/link/strict-mode-find-node%s \n    at button\n    at ButtonBase2 (http://localhost:5197/node_modules/.vite/deps/chunk-UTKUW7QJ.js?v=319dde57:421:22)\n    at WithStyles2 (http://localhost:"
+      "error: Warning: Failed %s type: %s%s prop The prop `onBackdropClick` of `ForwardRef(Modal2)` is deprecated. Use the onClose prop with the `reason` argument to handle the `backdropClick` events. \n    at Modal2 (http://localhost:5197/node_modules/.vite/deps/chunk-TIESZIP5.js?v=a7db9326:463:15)\n    at MuiThemeDemo (http://localhost:5197/src/libtests/MuiThemeDemo.tsx:110:33)\n    at ErrorBoundary (http",
+      "error: Warning: React does not recognize the `%s` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `%s` instead. If you accidentally passed it from a parent component, remove it from the DOM element.%s fullWidth fullwidth \n    at div\n    at div\n    at Autocomplete2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_lab_A",
+      "error: Warning: React does not recognize the `%s` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `%s` instead. If you accidentally passed it from a parent component, remove it from the DOM element.%s InputLabelProps inputlabelprops \n    at div\n    at div\n    at Autocomplete2 (http://localhost:5197/node_modules/.vite/deps/@mater",
+      "error: Warning: React does not recognize the `%s` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `%s` instead. If you accidentally passed it from a parent component, remove it from the DOM element.%s InputProps inputprops \n    at div\n    at div\n    at Autocomplete2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_lab",
+      "error: Warning: React does not recognize the `%s` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `%s` instead. If you accidentally passed it from a parent component, remove it from the DOM element.%s inputProps inputprops \n    at div\n    at div\n    at Autocomplete2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_lab",
+      "error: Material-UI: The GridList component was renamed to ImageList to align with the current Material Design naming.\n\nYou should use `import { ImageList } from '@material-ui/core'`\nor `import ImageList from '@material-ui/core/ImageList'`.",
+      "error: Material-UI: The GridListTile component was renamed to ImageListItem to align with the current Material Design naming.\n\nYou should use `import { ImageListItem } from '@material-ui/core'`\nor `import ImageListItem from '@material-ui/core/ImageListItem'`.",
+      "error: Warning: Failed %s type: %s%s prop Material-UI: `fontSize=\"default\"` is deprecated. Use `fontSize=\"medium\"` instead. \n    at Icon2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_core_Icon.js?v=a4095033:82:23)\n    at WithStyles2 (http://localhost:5197/node_modules/.vite/deps/chunk-57GKFK4Y.js?v=a7db9326:3364:31)\n    at div\n    at ThemeProvider (http://localhost:5197/node_modules",
+      "error: Warning: %s: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.%s PickerWithState \n    at PickerWithState (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.js?v=86ef5f47:2922:38)\n    at div\n    at MuiPickersUtilsProvider2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.",
+      "error: Warning: %s: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.%s ModalWrapper2 \n    at ModalWrapper2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.js?v=86ef5f47:403:20)\n    at Wrapper2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.js?v=86ef5f47:481:23)\n    at Pic",
+      "error: Warning: %s: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.%s KeyboardDateInput2 \n    at KeyboardDateInput2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.js?v=86ef5f47:2695:26)\n    at ModalWrapper2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.js?v=86ef5f47:40",
+      "error: Warning: findDOMNode is deprecated and will be removed in the next major release. Instead, add a ref directly to the element you want to reference. Learn more about using refs safely here: https://reactjs.org/link/strict-mode-find-node%s \n    at button\n    at ButtonBase2 (http://localhost:5197/node_modules/.vite/deps/chunk-DP33CSOX.js?v=a7db9326:425:22)\n    at WithStyles2 (http://localhost:"
     ],
     "consoleWarnings": [],
-    "bodyTextSample": "Dependency-stack smoke test — react18 + ReactDOM.render (legacy root)\nmui-core\nOPEN DIALOG\nOPEN MENU\nSHOW SNACKBAR\nText field\nA\nOPEN DRAWER\nmui-lab\nAutocomplete\n1\n2\n3\n4\n5\n1 Star\n2 Stars\n3 Stars\n4 Star"
+    "bodyTextSample": "Dependency-stack smoke test — react18 + ReactDOM.render (legacy root)\npage:\nstack-grid repro\ndependency-stack smoke test\ncell:\n2 — ReactDOM.render (control)\n3 — createRoot\n4 — createRoot + StrictMode\n"
   },
   "3": {
     "cell": "3",
@@ -79,6 +109,26 @@
         "unmounts": 0,
         "notes": []
       },
+      "mui-theme": {
+        "name": "mui-theme",
+        "status": "ok",
+        "mounts": 1,
+        "unmounts": 0,
+        "notes": [
+          "ok MuiAlert override: expected #123456 (rgb(18, 52, 86)) got=rgb(18, 52, 86)",
+          "ok MuiAutocomplete override: expected #00aa55 (rgb(0, 170, 85)) got=rgb(0, 170, 85)",
+          "ok MuiPaper override: expected #fef3e0 (rgb(254, 243, 224)) got=rgb(254, 243, 224)",
+          "ok MuiTooltip override: expected #2d0033 (rgb(45, 0, 51)) got=rgb(45, 0, 51)",
+          "ok MuiAvatar override: expected #004488 (rgb(0, 68, 136)) got=rgb(0, 68, 136)",
+          "ok MuiLinearProgress override: expected #cc0066 (rgb(204, 0, 102)) got=rgb(204, 0, 102)",
+          "ok MuiBackdrop (Modal) override: expected rgba(10, 20, 30, 0.85) (rgba(10, 20, 30, 0.85)) got=rgba(10, 20, 30, 0.85)",
+          "ok MuiStepper override: expected #f0f8ff (rgb(240, 248, 255)) got=rgb(240, 248, 255)",
+          "theme.palette.primary applied to button: rgb(26, 43, 60)",
+          "JSS <style data-jss> sheets: 56",
+          "JSS duplicate sheets (same data-meta more than once): [[\"MuiButtonBase\",2],[\"MuiFormLabel\",2],[\"MuiInputLabel\",2],[\"MuiInputBase\",2],[\"MuiSvgIcon\",2],[\"MuiFormControl\",2],[\"MuiTextField\",2],[\"MuiDialog\",2],[\"MuiTooltip\",2],[\"makeStyles\",3],[\"MuiIconButton\",2],[\"MuiAutocomplete\",2],[\"MuiPickersModal\",2]]",
+          "JSS dynamic $ conditional after click: borderWidth 4px -> 2px (expect a change)"
+        ]
+      },
       "mui-lab": {
         "name": "mui-lab",
         "status": "ok",
@@ -99,7 +149,7 @@
         "mounts": 1,
         "unmounts": 0,
         "notes": [
-          "frames observed: 151",
+          "frames observed: 150",
           "torn frames (readers disagreed): 0",
           "final counter value: 401"
         ]
@@ -123,16 +173,26 @@
         ]
       }
     },
-    "consoleErrorCount": 3,
+    "consoleErrorCount": 13,
     "consoleWarningCount": 0,
     "pageErrors": [],
     "consoleErrors": [
-      "error: Warning: %s: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.%s PickerWithState \n    at PickerWithState (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.js?v=4457eb41:2915:38)\n    at div\n    at MuiPickersUtilsProvider2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.",
-      "error: Warning: %s: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.%s ModalWrapper2 \n    at ModalWrapper2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.js?v=4457eb41:396:20)\n    at Wrapper2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.js?v=4457eb41:474:23)\n    at Pic",
-      "error: Warning: findDOMNode is deprecated and will be removed in the next major release. Instead, add a ref directly to the element you want to reference. Learn more about using refs safely here: https://reactjs.org/link/strict-mode-find-node%s \n    at button\n    at ButtonBase2 (http://localhost:5197/node_modules/.vite/deps/chunk-UTKUW7QJ.js?v=319dde57:421:22)\n    at WithStyles2 (http://localhost:"
+      "error: Material-UI: the createMuiTheme function was renamed to createTheme.\n\nYou should use `import { createTheme } from '@material-ui/core/styles'`",
+      "error: Warning: Failed %s type: %s%s prop The prop `onBackdropClick` of `ForwardRef(Modal2)` is deprecated. Use the onClose prop with the `reason` argument to handle the `backdropClick` events. \n    at Modal2 (http://localhost:5197/node_modules/.vite/deps/chunk-TIESZIP5.js?v=a7db9326:463:15)\n    at MuiThemeDemo (http://localhost:5197/src/libtests/MuiThemeDemo.tsx:110:33)\n    at ErrorBoundary (http",
+      "error: Warning: React does not recognize the `%s` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `%s` instead. If you accidentally passed it from a parent component, remove it from the DOM element.%s fullWidth fullwidth \n    at div\n    at div\n    at Autocomplete2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_lab_A",
+      "error: Warning: React does not recognize the `%s` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `%s` instead. If you accidentally passed it from a parent component, remove it from the DOM element.%s InputLabelProps inputlabelprops \n    at div\n    at div\n    at Autocomplete2 (http://localhost:5197/node_modules/.vite/deps/@mater",
+      "error: Warning: React does not recognize the `%s` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `%s` instead. If you accidentally passed it from a parent component, remove it from the DOM element.%s InputProps inputprops \n    at div\n    at div\n    at Autocomplete2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_lab",
+      "error: Warning: React does not recognize the `%s` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `%s` instead. If you accidentally passed it from a parent component, remove it from the DOM element.%s inputProps inputprops \n    at div\n    at div\n    at Autocomplete2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_lab",
+      "error: Material-UI: The GridList component was renamed to ImageList to align with the current Material Design naming.\n\nYou should use `import { ImageList } from '@material-ui/core'`\nor `import ImageList from '@material-ui/core/ImageList'`.",
+      "error: Material-UI: The GridListTile component was renamed to ImageListItem to align with the current Material Design naming.\n\nYou should use `import { ImageListItem } from '@material-ui/core'`\nor `import ImageListItem from '@material-ui/core/ImageListItem'`.",
+      "error: Warning: Failed %s type: %s%s prop Material-UI: `fontSize=\"default\"` is deprecated. Use `fontSize=\"medium\"` instead. \n    at Icon2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_core_Icon.js?v=a4095033:82:23)\n    at WithStyles2 (http://localhost:5197/node_modules/.vite/deps/chunk-57GKFK4Y.js?v=a7db9326:3364:31)\n    at div\n    at ThemeProvider (http://localhost:5197/node_modules",
+      "error: Warning: %s: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.%s PickerWithState \n    at PickerWithState (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.js?v=86ef5f47:2922:38)\n    at div\n    at MuiPickersUtilsProvider2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.",
+      "error: Warning: %s: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.%s ModalWrapper2 \n    at ModalWrapper2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.js?v=86ef5f47:403:20)\n    at Wrapper2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.js?v=86ef5f47:481:23)\n    at Pic",
+      "error: Warning: %s: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.%s KeyboardDateInput2 \n    at KeyboardDateInput2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.js?v=86ef5f47:2695:26)\n    at ModalWrapper2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.js?v=86ef5f47:40",
+      "error: Warning: findDOMNode is deprecated and will be removed in the next major release. Instead, add a ref directly to the element you want to reference. Learn more about using refs safely here: https://reactjs.org/link/strict-mode-find-node%s \n    at button\n    at ButtonBase2 (http://localhost:5197/node_modules/.vite/deps/chunk-DP33CSOX.js?v=a7db9326:425:22)\n    at WithStyles2 (http://localhost:"
     ],
     "consoleWarnings": [],
-    "bodyTextSample": "Dependency-stack smoke test — react18 + createRoot\nmui-core\nOPEN DIALOG\nOPEN MENU\nSHOW SNACKBAR\nText field\nA\nOPEN DRAWER\nmui-lab\nAutocomplete\n1\n2\n3\n4\n5\n1 Star\n2 Stars\n3 Stars\n4 Stars\n5 Stars\nmui-picke"
+    "bodyTextSample": "Dependency-stack smoke test — react18 + createRoot\npage:\nstack-grid repro\ndependency-stack smoke test\ncell:\n2 — ReactDOM.render (control)\n3 — createRoot\n4 — createRoot + StrictMode\nPer-section results"
   },
   "4": {
     "cell": "4",
@@ -145,6 +205,26 @@
         "mounts": 2,
         "unmounts": 1,
         "notes": []
+      },
+      "mui-theme": {
+        "name": "mui-theme",
+        "status": "ok",
+        "mounts": 2,
+        "unmounts": 1,
+        "notes": [
+          "ok MuiAlert override: expected #123456 (rgb(18, 52, 86)) got=rgb(18, 52, 86)",
+          "ok MuiAutocomplete override: expected #00aa55 (rgb(0, 170, 85)) got=rgb(0, 170, 85)",
+          "ok MuiPaper override: expected #fef3e0 (rgb(254, 243, 224)) got=rgb(254, 243, 224)",
+          "ok MuiTooltip override: expected #2d0033 (rgb(45, 0, 51)) got=rgb(45, 0, 51)",
+          "ok MuiAvatar override: expected #004488 (rgb(0, 68, 136)) got=rgb(0, 68, 136)",
+          "ok MuiLinearProgress override: expected #cc0066 (rgb(204, 0, 102)) got=rgb(204, 0, 102)",
+          "ok MuiBackdrop (Modal) override: expected rgba(10, 20, 30, 0.85) (rgba(10, 20, 30, 0.85)) got=rgba(10, 20, 30, 0.85)",
+          "ok MuiStepper override: expected #f0f8ff (rgb(240, 248, 255)) got=rgb(240, 248, 255)",
+          "theme.palette.primary applied to button: rgb(26, 43, 60)",
+          "JSS <style data-jss> sheets: 56",
+          "JSS duplicate sheets (same data-meta more than once): [[\"MuiButtonBase\",2],[\"MuiFormLabel\",2],[\"MuiInputLabel\",2],[\"MuiInputBase\",2],[\"MuiSvgIcon\",2],[\"MuiFormControl\",2],[\"MuiTextField\",2],[\"MuiDialog\",2],[\"MuiTooltip\",2],[\"makeStyles\",3],[\"MuiIconButton\",2],[\"MuiAutocomplete\",2],[\"MuiPickersModal\",2]]",
+          "JSS dynamic $ conditional after click: borderWidth 4px -> 2px (expect a change)"
+        ]
       },
       "mui-lab": {
         "name": "mui-lab",
@@ -166,7 +246,7 @@
         "mounts": 2,
         "unmounts": 1,
         "notes": [
-          "frames observed: 151",
+          "frames observed: 149",
           "torn frames (readers disagreed): 0",
           "final counter value: 401"
         ]
@@ -192,15 +272,26 @@
         ]
       }
     },
-    "consoleErrorCount": 3,
+    "consoleErrorCount": 14,
     "consoleWarningCount": 0,
     "pageErrors": [],
     "consoleErrors": [
-      "error: Warning: %s: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.%s PickerWithState \n    at PickerWithState (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.js?v=4457eb41:2915:38)\n    at div\n    at MuiPickersUtilsProvider2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.",
-      "error: Warning: %s: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.%s ModalWrapper2 \n    at ModalWrapper2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.js?v=4457eb41:396:20)\n    at Wrapper2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.js?v=4457eb41:474:23)\n    at Pic",
-      "error: Warning: findDOMNode is deprecated and will be removed in the next major release. Instead, add a ref directly to the element you want to reference. Learn more about using refs safely here: https://reactjs.org/link/strict-mode-find-node%s \n    at button\n    at ButtonBase2 (http://localhost:5197/node_modules/.vite/deps/chunk-UTKUW7QJ.js?v=319dde57:421:22)\n    at WithStyles2 (http://localhost:"
+      "error: Material-UI: the createMuiTheme function was renamed to createTheme.\n\nYou should use `import { createTheme } from '@material-ui/core/styles'`",
+      "error: Warning: Failed %s type: %s%s prop The prop `onBackdropClick` of `ForwardRef(Modal2)` is deprecated. Use the onClose prop with the `reason` argument to handle the `backdropClick` events. \n    at Modal2 (http://localhost:5197/node_modules/.vite/deps/chunk-TIESZIP5.js?v=a7db9326:463:15)\n    at MuiThemeDemo (http://localhost:5197/src/libtests/MuiThemeDemo.tsx:110:33)\n    at ErrorBoundary (http",
+      "error: Warning: React does not recognize the `%s` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `%s` instead. If you accidentally passed it from a parent component, remove it from the DOM element.%s fullWidth fullwidth \n    at div\n    at div\n    at Autocomplete2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_lab_A",
+      "error: Warning: React does not recognize the `%s` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `%s` instead. If you accidentally passed it from a parent component, remove it from the DOM element.%s InputLabelProps inputlabelprops \n    at div\n    at div\n    at Autocomplete2 (http://localhost:5197/node_modules/.vite/deps/@mater",
+      "error: Warning: React does not recognize the `%s` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `%s` instead. If you accidentally passed it from a parent component, remove it from the DOM element.%s InputProps inputprops \n    at div\n    at div\n    at Autocomplete2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_lab",
+      "error: Warning: React does not recognize the `%s` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `%s` instead. If you accidentally passed it from a parent component, remove it from the DOM element.%s inputProps inputprops \n    at div\n    at div\n    at Autocomplete2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_lab",
+      "error: Material-UI: The GridList component was renamed to ImageList to align with the current Material Design naming.\n\nYou should use `import { ImageList } from '@material-ui/core'`\nor `import ImageList from '@material-ui/core/ImageList'`.",
+      "error: Material-UI: The GridListTile component was renamed to ImageListItem to align with the current Material Design naming.\n\nYou should use `import { ImageListItem } from '@material-ui/core'`\nor `import ImageListItem from '@material-ui/core/ImageListItem'`.",
+      "error: Warning: Failed %s type: %s%s prop Material-UI: `fontSize=\"default\"` is deprecated. Use `fontSize=\"medium\"` instead. \n    at Icon2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_core_Icon.js?v=a4095033:82:23)\n    at WithStyles2 (http://localhost:5197/node_modules/.vite/deps/chunk-57GKFK4Y.js?v=a7db9326:3364:31)\n    at div\n    at ThemeProvider (http://localhost:5197/node_modules",
+      "error: Warning: %s: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.%s PickerWithState \n    at PickerWithState (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.js?v=86ef5f47:2922:38)\n    at div\n    at MuiPickersUtilsProvider2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.",
+      "error: Warning: %s: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.%s ModalWrapper2 \n    at ModalWrapper2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.js?v=86ef5f47:403:20)\n    at Wrapper2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.js?v=86ef5f47:481:23)\n    at Pic",
+      "error: Warning: %s: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.%s KeyboardDateInput2 \n    at KeyboardDateInput2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.js?v=86ef5f47:2695:26)\n    at ModalWrapper2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.js?v=86ef5f47:40",
+      "error: Warning: findDOMNode is deprecated and will be removed in the next major release. Instead, add a ref directly to the element you want to reference. Learn more about using refs safely here: https://reactjs.org/link/strict-mode-find-node%s \n    at button\n    at ButtonBase2 (http://localhost:5197/node_modules/.vite/deps/chunk-DP33CSOX.js?v=a7db9326:425:22)\n    at WithStyles2 (http://localhost:",
+      "error: Warning: %s is deprecated in StrictMode. %s was passed an instance of %s which is inside StrictMode. Instead, add a ref directly to the element you want to reference. Learn more about using refs safely here: https://reactjs.org/link/strict-mode-find-node%s findDOMNode findDOMNode Transition2 \n    at div\n    at Transition2 (http://localhost:5197/node_modules/.vite/deps/chunk-H4AHO55J.js?v=a7"
     ],
     "consoleWarnings": [],
-    "bodyTextSample": "Dependency-stack smoke test — react18 + createRoot + StrictMode\nmui-core\nOPEN DIALOG\nOPEN MENU\nSHOW SNACKBAR\nText field\nA\nOPEN DRAWER\nmui-lab\nAutocomplete\n1\n2\n3\n4\n5\n1 Star\n2 Stars\n3 Stars\n4 Stars\n5 St"
+    "bodyTextSample": "Dependency-stack smoke test — react18 + createRoot + StrictMode\npage:\nstack-grid repro\ndependency-stack smoke test\ncell:\n2 — ReactDOM.render (control)\n3 — createRoot\n4 — createRoot + StrictMode\nPer-se"
   }
 }

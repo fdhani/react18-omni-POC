@@ -164,14 +164,95 @@ Same pattern as `react-stack-grid`'s dependency chain: these libraries work
 today, but a future React 19 migration would need all of them replaced or
 patched, not just upgraded.
 
+## MUI v4 theme/JSS integrity under React 18
+
+The initial smoke test only proved MUI v4 *installs and mounts* under React 18
+— it never touched what the dependency-upgrade investigation actually
+identified as the risk: a customized theme, JSS `overrides`, and the specific
+API surface it flagged by file count (§6 of that investigation). This section
+tests that directly: a representative theme with custom palette/breakpoints/
+shadows/typography, `defaultProps`, and JSS `overrides` for the exact 8
+components the investigation names (Alert, Autocomplete, Paper, Tooltip,
+Avatar, LinearProgress, Modal, Stepper) — not the real theme, which this
+session has no access to, but built to the same shape.
+
+Also covers the specific breaking-change API usages the investigation counted
+by file (`labelWidth`, `GridList`, `gridGap`, `disableTypography`,
+`fontSize="default"`), a JSS `&$active` conditional-selector composition
+(exercised through an actual click, not just initial render), and the picker
+stack with a Luxon adapter and `Keyboard*` picker variants, matching the
+investigation's note about "a custom Luxon adapter of roughly 350 lines"
+more closely than the plain-Moment pickers tested earlier (also required
+technically — `@material-ui/pickers` v3's typings tie the whole TypeScript
+program to one date-library adapter, so both picker demos now use Luxon).
+
+**Every check verifies via `getComputedStyle` after mount that the override
+actually took visual effect** — not just that nothing crashed. Two of the
+eight initially came back "FAIL"; both turned out to be mistakes in the test
+itself, not MUI/React 18 bugs, and are worth recording precisely since they
+illustrate exactly the "component DOM changes can invalidate overrides
+without a compile error" risk the investigation describes in the abstract:
+
+- **`MuiAvatar`**: the override targeted the `root` class key; the actual
+  background color lives on `colorDefault`, applied alongside `root` only
+  when there's no image. Confirmed by inspecting the rendered class list
+  (`MuiAvatar-root MuiAvatar-circular MuiAvatar-colorDefault`), not assumed.
+- **`MuiBackdrop`**: a bare `<Modal open>`'s *default* backdrop is
+  `SimpleBackdrop`, a separate internal component with hardcoded inline
+  styles that deliberately never goes through `withStyles`/the theme at all.
+  The theme-aware `Backdrop` only appears if `BackdropComponent={Backdrop}`
+  is passed explicitly.
+
+After fixing both (in the test, not in MUI), **all 8 named overrides apply
+correctly, in all three cells** (legacy root, `createRoot`, `createRoot` +
+StrictMode), confirmed by computed style, not appearance:
+
+```
+ok MuiAlert override, MuiAutocomplete override, MuiPaper override,
+   MuiTooltip override, MuiAvatar override, MuiLinearProgress override,
+   MuiBackdrop (Modal) override, MuiStepper override   — all 3 cells
+```
+
+The JSS `&$active` conditional composition also works correctly through an
+actual state-driven re-render (not just at initial mount) in all three cells
+— `borderWidth: 4px → 2px` on click, confirmed via Playwright, in every cell.
+
+### JSS style-injection integrity under StrictMode
+
+This is the direct analogue of the `react-sizeme` bug already found in the
+`react-stack-grid` repro (a resize-detector's teardown not surviving React
+18's double-mount) — does JSS's own `<style data-jss>` sheet manager survive
+the same double-mount cleanly, leak duplicates, or drop sheets?
+
+**Result: `createRoot` and `createRoot`+StrictMode produce the *identical*
+sheet count (56) and the identical set of per-component duplicates.**
+StrictMode's double-invoke does not add or leak a single extra JSS sheet —
+unlike `react-sizeme`, JSS's teardown is StrictMode-safe.
+
+(The baseline duplication itself — several components like `MuiButtonBase`,
+`MuiTextField`, `MuiDialog` each showing exactly 2 sheets — is normal JSS
+behavior, present identically in *all three* cells including the legacy
+root: JSS emits a separate sheet for static vs. dynamic/prop-dependent rules
+per component. Not a defect, not React-18-specific.)
+
+One reproducible (3/3 runs), minor difference did turn up: the **legacy
+root consistently shows 58 sheets versus 56 for `createRoot`**, with one
+extra `MuiTouchRipple` duplicate that never appears under `createRoot`. Zero
+console errors, no visual difference detected, and the root cause wasn't
+traced further (would require digging into `ButtonBase`/`TouchRipple`'s
+internal timing) — recorded as an observed, deterministic curiosity, not a
+finding either direction. If anything, it says legacy-root creates *more*
+incidental JSS activity than `createRoot`, not less.
+
 ## Bundle size
 
-Adding this whole stack more than tripled the built JS: 256 KB → 828 KB
-(gzip: 78 KB → 246 KB). Expected given `@material-ui/core` + `lab` + `pickers`
-+ `moment` are all sizeable, and irrelevant to the React 18 question, but
-worth knowing if this stack is heading to production as-is — `moment` and
-MUI v4 in particular are commonly trimmed in real migrations (date-fns,
-tree-shaken icon imports, MUI v5).
+Adding this whole stack more than tripled the built JS: 256 KB → 765 KB
+(gzip: 78 KB → 231 KB, after switching the picker adapter from Moment to
+Luxon — Luxon is somewhat smaller). Expected given `@material-ui/core` +
+`lab` + `pickers` are all sizeable, and irrelevant to the React 18 question,
+but worth knowing if this stack is heading to production as-is — MUI v4 in
+particular is commonly trimmed in real migrations (tree-shaken icon imports,
+MUI v5).
 
 ## Confidence
 
@@ -179,12 +260,28 @@ tree-shaken icon imports, MUI v5).
 across both root APIs and both build modes — this was a direct, repeatable
 render-and-inspect test, not an inference.
 
+**High** that a *representative* customized MUI v4 theme (custom palette,
+breakpoints, shadows, typography, `defaultProps`, and JSS `overrides` for the
+8 components the dependency-upgrade investigation names) survives React 18
+intact — verified via computed style, in all three cells, including one full
+click-driven re-render through JSS's dynamic composition path, not just
+static mount.
+
 **Moderate** on the redux tearing result specifically — a negative result on
 a race condition is only as strong as the workload used to look for it. If
 this stack is going to production carrying real traffic patterns, I'd treat
 "no tearing observed here" as encouraging, not conclusive.
 
-**Not tested**: user interaction with each widget beyond initial mount (typing
-into the date pickers, opening every menu/dialog repeatedly, submitting the
-hook-form with invalid data to check validation-error rendering). This was a
-mount/render smoke test, not a full interaction test of each library.
+**Not tested — the largest remaining gap**: the *real* theme. This session
+has no access to the actual Omni Frontend repo, so the theme tested here is
+representative of the shape the investigation describes, not the real
+customizations, global `.Mui*` selectors, or the ~145 shared atoms/molecules
+it names as coupled to MUI. A representative theme surviving React 18 is
+meaningfully more evidence than the initial default-styled smoke test, but it
+is still not the same claim as "the production theme survives."
+
+**Not tested**: user interaction with each widget beyond initial mount and the
+one JSS-composition click (typing into the date pickers, opening every menu/
+dialog repeatedly, submitting the hook-form with invalid data to check
+validation-error rendering). Still a mount/render + one-interaction smoke
+test, not a full interaction test of each library.

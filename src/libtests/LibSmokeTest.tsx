@@ -2,6 +2,7 @@ import * as React from 'react';
 import { CellSwitcher, ViewSwitcher } from '../Nav';
 import { ErrorBoundary } from './ErrorBoundary';
 import MuiCoreDemo from './MuiCoreDemo';
+import MuiThemeDemo from './MuiThemeDemo';
 import MuiLabDemo from './MuiLabDemo';
 import MuiPickersDemo from './MuiPickersDemo';
 import ReduxDemo from './ReduxDemo';
@@ -10,6 +11,7 @@ import ReactVirtualizedDemo from './ReactVirtualizedDemo';
 
 const SECTIONS: Array<[string, React.ComponentType]> = [
   ['mui-core', MuiCoreDemo],
+  ['mui-theme', MuiThemeDemo],
   ['mui-lab', MuiLabDemo],
   ['mui-pickers', MuiPickersDemo],
   ['redux', ReduxDemo],

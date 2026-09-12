@@ -30,11 +30,14 @@ running React 17"*. Cell 2 vs cell 3 is therefore a direct isolation of
 ## Layout
 
 ```
-shared/      app source (App, per-frame probe, entrypoint)
-app18/       React 18.3.1 + react-stack-grid 0.7.1
-harness/     Playwright driver + offline analyzers
-build-site.mjs  builds the static site into dist/
+src/         app source (App, per-frame probe, entrypoint)
+harness/     Playwright driver + offline analyzers (own package.json)
 ```
+
+A single Vite app at the repository root. It is deliberately **not** in a
+subdirectory: Vercel auto-detects a nested Vite app as the project Root
+Directory, which silently changes which `package.json` its build command runs
+against.
 
 Installed with npm `overrides` to bypass the peer ranges of `react-sizeme` and
 `react-transition-group`, which do not declare React 18 support:
@@ -58,7 +61,7 @@ react-stack-grid@0.7.1          peer react: >=15.3.0
 
 ## Instrumentation
 
-`shared/probe.ts` runs a `requestAnimationFrame` loop recording, per frame, the
+`src/probe.ts` runs a `requestAnimationFrame` loop recording, per frame, the
 container's measured width/height alongside every child's computed `transform`
 and box size. Exposed as `window.__probe`; call `window.__probe.result()` in the
 console.
@@ -78,11 +81,13 @@ up as a longer tail here.
 ## Running it
 
 ```bash
-npm run install:all
+npm install               # the app
+npm --prefix harness install   # Playwright, only needed to measure
 npm run dev               # http://localhost:5173/?cell=3
 npm run build             # static site into dist/
 npm run measure           # Playwright, production build, all 3 cells
 npm run analyze
+npm run verify            # assert a built dist/ renders every cell
 ```
 
 Other harness configurations:
@@ -93,7 +98,6 @@ node harness/run.mjs prod 480 6    # library default duration=480
 node harness/run.mjs prod 0 60     # 60-card grid
 node harness/run.mjs dev 0 6       # dev build (React warnings visible)
 node harness/trace.mjs 3           # DevTools trace: does a paint land in the tear?
-node harness/verifydist.mjs        # assert a built dist/ renders every cell
 ```
 
 ### Query params
@@ -117,19 +121,25 @@ Zero-config static Vite SPA. From the repo root:
 vercel --prod          # or: Import the repo in the Vercel dashboard
 ```
 
-`vercel.json` sets `buildCommand: npm run vercel-build` and
-`outputDirectory: dist`. The build is `vite build`, so what deploys is the
-**production** bundle — React's development warnings are compiled out, and
-StrictMode does not double-invoke effects.
+**Vercel's Root Directory must be the repository root (`./`).** If it is set to
+a subdirectory the build runs against the wrong `package.json` and fails with
+`Missing script`. `vercel.json` pins `framework: vite`, `buildCommand: npm run
+build`, `outputDirectory: dist`.
 
-Routes on the deployed site:
+The build is `vite build`, so what deploys is the **production** bundle —
+React's development warnings are compiled out, and StrictMode does not
+double-invoke effects (so cell 4 renders normally in production; the StrictMode
+failure below is a development-build symptom).
+
+Routes on the deployed site — the page carries an in-page switcher, so `/` is
+enough to reach everything:
 
 | Cell | URL |
 |---|---|
-| landing | `/` |
-| 2 — legacy root (control) | `/r18/index.html?cell=2&pathB=1` |
-| 3 — `createRoot` | `/r18/index.html?cell=3&pathB=1` |
-| 4 — `createRoot` + StrictMode | `/r18/index.html?cell=4&pathB=1` |
+| default (cell 3) | `/` |
+| 2 — legacy root (control) | `/?cell=2&pathB=1` |
+| 3 — `createRoot` | `/?cell=3&pathB=1` |
+| 4 — `createRoot` + StrictMode | `/?cell=4&pathB=1` |
 
 Swap `pathB=1` for `pathB=0` to test Path A (resize) instead, and append
 `&duration=480` to see the library's default transition.

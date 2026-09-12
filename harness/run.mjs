@@ -12,23 +12,23 @@ const CARDS = process.argv[4] ?? '6';
 const OUT = path.join(root, 'results');
 fs.mkdirSync(OUT, { recursive: true });
 
-const PORTS = { app18: MODE === 'dev' ? 5318 : 4318 };
+const PORT = MODE === 'dev' ? 5318 : 4318;
 
-function startServer(app) {
-  const port = PORTS[app];
+function startServer() {
+  const port = PORT;
   // Spawn vite's binary directly (not via npx) in its own process group, so it
   // can actually be killed. An npx grandchild survives and keeps the port.
-  const bin = path.join(root, app, 'node_modules', 'vite', 'bin', 'vite.js');
+  const bin = path.join(root, 'node_modules', 'vite', 'bin', 'vite.js');
   const args = MODE === 'dev'
     ? [bin, '--port', String(port), '--strictPort']
     : [bin, 'preview', '--port', String(port), '--strictPort'];
   const p = spawn(process.execPath, args, {
-    cwd: path.join(root, app),
+    cwd: root,
     stdio: ['ignore', 'pipe', 'pipe'],
     detached: true,
   });
   p.stdout.on('data', () => {});
-  p.stderr.on('data', (d) => process.stderr.write(`[${app}] ${d}`));
+  p.stderr.on('data', (d) => process.stderr.write(`[vite] ${d}`));
   return p;
 }
 
@@ -114,25 +114,22 @@ async function runCell({ browser, cell, url, path: pathName, video }) {
   return res;
 }
 
-await waitPortFree(PORTS.app18);
-const servers = [startServer('app18')];
+await waitPortFree(PORT);
+const servers = [startServer()];
 process.on('exit', () => { for (const s of servers) { try { process.kill(-s.pid, 'SIGKILL'); } catch {} } });
 
 try {
-  await waitFor(`http://localhost:${PORTS.app18}/`);
+  await waitFor(`http://localhost:${PORT}/`);
 
   const browser = await chromium.launch({ args: ['--force-device-scale-factor=1'] });
   const q = (cell, pathName) =>
     `cell=${cell}&pathB=${pathName === 'B' ? 1 : 0}&duration=${DURATION}&cards=${CARDS}`;
 
-  const cells = [
-    { cell: '2', base: `http://localhost:${PORTS.app18}/` },
-    { cell: '3', base: `http://localhost:${PORTS.app18}/` },
-    { cell: '4', base: `http://localhost:${PORTS.app18}/` },
-  ];
+  const cells = [{ cell: '2' }, { cell: '3' }, { cell: '4' }];
+  const base = `http://localhost:${PORT}/`;
 
   const all = [];
-  for (const { cell, base } of cells) {
+  for (const { cell } of cells) {
     for (const pathName of ['A', 'B']) {
       const video = pathName === 'A' && (cell === '2' || cell === '3');
       const r = await runCell({ browser, cell, url: `${base}?${q(cell, pathName)}`, path: pathName, video });

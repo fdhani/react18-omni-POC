@@ -6,15 +6,16 @@ StrictMode matrix used for `react-stack-grid` (`?cell=2|3|4`), in both `vite
 dev` and a production build.
 
 ```
-@material-ui/core     4.12.4          (requested ^4.11.0)
-@material-ui/icons    4.11.3          (requested ^4.11.3)
-@material-ui/lab      4.0.0-alpha.61  (requested ^4.0.0-alpha.61)
-@material-ui/pickers  3.3.10          (requested ^3.2.10)
-react-redux            7.2.9          (requested ^7.2.2)
-@reduxjs/toolkit       1.6.2          (requested ^1.6.2, exact)
-react-hook-form        6.13.1         (requested, exact)
-react-virtualized      9.22.5         (requested ^9.22.3)
-use-memo-one           1.1.2          (requested, exact — transitive)
+@material-ui/core       4.12.4          (requested ^4.11.0)
+@material-ui/icons      4.11.3          (requested ^4.11.3)
+@material-ui/lab        4.0.0-alpha.61  (requested ^4.0.0-alpha.61)
+@material-ui/pickers    3.3.10          (requested ^3.2.10)
+react-redux              7.2.9          (requested ^7.2.2)
+@reduxjs/toolkit         1.6.2          (requested ^1.6.2, exact)
+@tanstack/react-query    4.36.1         (real app's pinned version — the "react-query" package)
+react-hook-form          6.13.1         (requested, exact)
+react-virtualized        9.22.5         (requested ^9.22.3)
+use-memo-one             1.1.2          (requested, exact — transitive)
 ```
 
 Try it: `?cell=3&libs=1` (add `&cell=2` for the legacy root, `&cell=4` for
@@ -148,6 +149,68 @@ here is not strong evidence of absence for a slower device or a heavier
 render tree. It's the reason `react-redux` v8 added
 `useSyncExternalStore` support in the first place; a library-level guarantee
 beats an empirical spot-check.
+
+## React Query: actually tested, not just peer-range-checked
+
+Earlier in this investigation, React Query was only checked at the peer
+metadata level (`@tanstack/react-query@4.36.1`'s range already permits React
+18). That's a fact about a `package.json`, not a runtime test — this closes
+the gap with the real thing: a `QueryClientProvider` + `useQuery` (two
+sibling components reading the same cached query) + `useMutation` calling
+`setQueryData` (the optimistic-update pattern the dependency-upgrade
+investigation names in §8.8 as the React Query replacement for a Redux
+domain's reducer), run through the identical tearing-probe methodology
+already used for `react-redux`.
+
+**Notably, `@tanstack/react-query@4.36.1` depends directly on
+`use-sync-external-store`** — unlike `react-redux@7` (which predates it and
+uses its own subscription mechanism), React Query v4 already uses React's
+own official concurrent-safe subscription primitive. This is a structurally
+stronger starting position than `react-redux`'s, not just an equivalent one,
+and the results bear that out:
+
+- **0 torn frames across ~120 observed frames, in every cell**, same as redux.
+- **The query function was invoked exactly once, in every cell — including
+  `createRoot`+StrictMode.** React 18 StrictMode deliberately double-invokes
+  effects specifically to surface side-effect bugs like a data fetch firing
+  twice; React Query's cache correctly deduped it. This is a stronger,
+  actually-measured result than an inference from the peer range or from
+  "it uses `useSyncExternalStore`" alone.
+- The mutation (`setQueryData`) correctly propagated to both cache readers,
+  confirmed after an actual click, in every cell.
+- Zero console errors or warnings in production, all three cells.
+
+## react-hook-form + Controller + MUI: the realistic integration point
+
+The earlier `react-hook-form` demo only tested the uncontrolled `register()`
+pattern. Given MUI is used in 2,431 files and RHF in 788 in the real app,
+the realistic integration point is almost certainly `Controller` wrapping
+MUI's *controlled* inputs — a materially different code path, tested here
+with `TextField`, `Select`, `Autocomplete`, and a `KeyboardDatePicker` all
+wired through the same form.
+
+`react-hook-form@6`'s `Controller` has a different render-prop signature
+than v7's — `render={(field, state) => ...}` where `field` is directly
+spreadable (`onChange`/`onBlur`/`value`/`name`/`ref`), not nested under a
+`field` key as in v7's `render={({ field }) => ...}`. This is one concrete,
+verified instance of the "breaking v6-to-v7 API migration" the
+dependency-upgrade investigation names — the two versions are not drop-in
+compatible at this exact call site, confirmed by reading `react-hook-form`'s
+own compiled type declarations, not assumed from the version-number jump
+alone.
+
+**Result: filled every controlled field and submitted, in every cell** —
+correct values came back for the plain `TextField`, the `Select`, the
+`Autocomplete` (its default `null`), and the `KeyboardDatePicker`
+(`2026-09-12`), all through the `Controller` render-prop path. Zero console
+errors in production.
+
+One test-harness bug caught along the way, not a library issue: the first
+attempt to fill the `TextField` failed silently because the check targeted
+MUI's outer `FormControl` wrapper div (where a `data-check` prop passed to
+`TextField` actually lands), not the inner `<input>` Playwright's `fill()`
+needs — confirmed by inspecting the rendered DOM, not assumed. Fixed by
+targeting `input` inside that wrapper.
 
 ## Forward risk (React 19), not a React 18 problem
 
@@ -328,10 +391,25 @@ plain-CSS-plus-JSS coexistence test) rather than an approximation of it —
 every named theme key, override target, and styling API (`useTheme`,
 `createStyles`, `styled`, `withStyles`) has now been exercised at least once.
 
+**Moderate-to-high** on React Query specifically — higher than the redux
+tearing result, because it isn't only a negative result (no tearing
+observed): the StrictMode double-fetch check is a positive, structural
+confirmation (exactly one fetch, when a bug would have produced two), and
+`use-sync-external-store` gives it a design-level reason to expect this
+result, not just an empirical one. Still: one workload, one browser,
+unthrottled.
+
 **Moderate** on the redux tearing result specifically — a negative result on
 a race condition is only as strong as the workload used to look for it. If
 this stack is going to production carrying real traffic patterns, I'd treat
 "no tearing observed here" as encouraging, not conclusive.
+
+**High** on `react-hook-form@6.13.1` + `Controller` + MUI's controlled
+inputs — a full fill-and-submit cycle through `TextField`, `Select`,
+`Autocomplete`, and a `KeyboardDatePicker`, verified end to end, in every
+cell. This is the realistic integration pattern given the two libraries'
+overlapping file counts in the real app, not the simpler uncontrolled
+`register()` case tested earlier.
 
 **Not tested — the remaining gap**: the *real* theme's actual values,
 selectors, and the ~145 shared atoms/molecules it names as coupled to MUI.
@@ -349,7 +427,17 @@ the same claim as "the production theme survives," and closing that gap
 fully requires the real files.
 
 **Not tested**: user interaction with each widget beyond initial mount and the
-one JSS-composition click (typing into the date pickers, opening every menu/
-dialog repeatedly, submitting the hook-form with invalid data to check
-validation-error rendering). Still a mount/render + one-interaction smoke
-test, not a full interaction test of each library.
+handful of clicks/fills added so far (opening every menu/dialog repeatedly,
+submitting a form with *invalid* data to check validation-error rendering,
+typing into the date pickers rather than only reading their default value).
+Still a mount/render + a few targeted interactions per library, not a full
+interaction test of each one.
+
+**Not tested**: `react-hook-form@7` itself, or the v6→v7 migration — only
+confirmed that v6's `Controller` signature differs from v7's by reading the
+type declarations, not that upgrading actually works. Also untested: React
+Query's own breaking migration (v4→v5, which is the version the dependency-
+upgrade investigation says requires React 18-or-newer), pagination, retries,
+`useInfiniteQuery`, and query invalidation across multiple keys — the smoke
+test here covers one query key and one mutation, not the library's broader
+surface.

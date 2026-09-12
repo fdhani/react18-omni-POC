@@ -37,8 +37,8 @@
           "ok GlobalStyles (withStyles '@global'): color=rgb(255, 68, 0)",
           "custom StepIcon states rendered: [\"completed\",\"active\",\"default\"]",
           "theme.palette.primary applied to button: rgb(26, 43, 60)",
-          "JSS <style data-jss> sheets: 64",
-          "JSS duplicate sheets (same data-meta more than once): [[\"MuiTouchRipple\",2],[\"MuiButtonBase\",2],[\"MuiButton\",2],[\"MuiInputBase\",2],[\"MuiInput\",2],[\"MuiFormLabel\",2],[\"MuiInputLabel\",2],[\"MuiFormControl\",2],[\"MuiSvgIcon\",2],[\"MuiTextField\",2],[\"MuiDialog\",2],[\"MuiTooltip\",2],[\"makeStyles\",7],[\"MuiIconButton\",2],[\"MuiAutocomplete\",2],[\"MuiPickersModal\",2]]",
+          "JSS <style data-jss> sheets: 65",
+          "JSS duplicate sheets (same data-meta more than once): [[\"MuiTouchRipple\",2],[\"MuiButtonBase\",2],[\"MuiButton\",2],[\"MuiInputBase\",2],[\"MuiInput\",2],[\"MuiFormLabel\",2],[\"MuiInputLabel\",2],[\"MuiFormControl\",2],[\"MuiSvgIcon\",2],[\"MuiTextField\",2],[\"MuiDialog\",2],[\"MuiTooltip\",2],[\"makeStyles\",7],[\"MuiIconButton\",2],[\"MuiAutocomplete\",2],[\"MuiPickersModal\",2],[\"MuiInputAdornment\",2]]",
           "JSS dynamic $ conditional after click: borderWidth 4px -> 2px (expect a change)"
         ]
       },
@@ -62,9 +62,22 @@
         "mounts": 1,
         "unmounts": 0,
         "notes": [
-          "frames observed: 151",
+          "frames observed: 149",
           "torn frames (readers disagreed): 0",
           "final counter value: 401"
+        ]
+      },
+      "react-query": {
+        "name": "react-query",
+        "status": "ok",
+        "mounts": 1,
+        "unmounts": 0,
+        "notes": [
+          "frames observed: 119",
+          "torn frames (readers disagreed): 0",
+          "fetchCounter invocations (StrictMode would double this if not deduped): 1",
+          "final cached value: 1",
+          "after mutation click: reader A=\"9999\" reader B=\"9999\" (expect both \"9999\")"
         ]
       },
       "react-hook-form": {
@@ -74,6 +87,19 @@
         "unmounts": 0,
         "notes": [
           "registered fields (formState.errors keys type ok): true"
+        ]
+      },
+      "rhf-controller": {
+        "name": "rhf-controller",
+        "status": "ok",
+        "mounts": 1,
+        "unmounts": 0,
+        "notes": [
+          "formState.errors accessible: true",
+          "formState.errors accessible: true",
+          "formState.errors accessible: true",
+          "formState.errors accessible: true",
+          "ok Controller+MUI submit: {\"name\":\"Controller Test Name\",\"color\":\"red\",\"autoValue\":null,\"date\":\"2026-09-12\"}"
         ]
       },
       "react-virtualized": {
@@ -142,8 +168,8 @@
           "ok GlobalStyles (withStyles '@global'): color=rgb(255, 68, 0)",
           "custom StepIcon states rendered: [\"completed\",\"active\",\"default\"]",
           "theme.palette.primary applied to button: rgb(26, 43, 60)",
-          "JSS <style data-jss> sheets: 62",
-          "JSS duplicate sheets (same data-meta more than once): [[\"MuiButtonBase\",2],[\"MuiButton\",2],[\"MuiInputBase\",2],[\"MuiInput\",2],[\"MuiFormLabel\",2],[\"MuiInputLabel\",2],[\"MuiFormControl\",2],[\"MuiSvgIcon\",2],[\"MuiTextField\",2],[\"MuiDialog\",2],[\"MuiTooltip\",2],[\"makeStyles\",7],[\"MuiIconButton\",2],[\"MuiAutocomplete\",2],[\"MuiPickersModal\",2]]",
+          "JSS <style data-jss> sheets: 63",
+          "JSS duplicate sheets (same data-meta more than once): [[\"MuiButtonBase\",2],[\"MuiButton\",2],[\"MuiInputBase\",2],[\"MuiInput\",2],[\"MuiFormLabel\",2],[\"MuiInputLabel\",2],[\"MuiFormControl\",2],[\"MuiSvgIcon\",2],[\"MuiTextField\",2],[\"MuiDialog\",2],[\"MuiTooltip\",2],[\"makeStyles\",7],[\"MuiIconButton\",2],[\"MuiAutocomplete\",2],[\"MuiPickersModal\",2],[\"MuiInputAdornment\",2]]",
           "JSS dynamic $ conditional after click: borderWidth 4px -> 2px (expect a change)"
         ]
       },
@@ -167,9 +193,22 @@
         "mounts": 1,
         "unmounts": 0,
         "notes": [
-          "frames observed: 150",
+          "frames observed: 151",
           "torn frames (readers disagreed): 0",
           "final counter value: 401"
+        ]
+      },
+      "react-query": {
+        "name": "react-query",
+        "status": "ok",
+        "mounts": 1,
+        "unmounts": 0,
+        "notes": [
+          "frames observed: 121",
+          "torn frames (readers disagreed): 0",
+          "fetchCounter invocations (StrictMode would double this if not deduped): 1",
+          "final cached value: 1",
+          "after mutation click: reader A=\"9999\" reader B=\"9999\" (expect both \"9999\")"
         ]
       },
       "react-hook-form": {
@@ -179,6 +218,18 @@
         "unmounts": 0,
         "notes": [
           "registered fields (formState.errors keys type ok): true"
+        ]
+      },
+      "rhf-controller": {
+        "name": "rhf-controller",
+        "status": "ok",
+        "mounts": 1,
+        "unmounts": 0,
+        "notes": [
+          "formState.errors accessible: true",
+          "formState.errors accessible: true",
+          "formState.errors accessible: true",
+          "ok Controller+MUI submit: {\"name\":\"Controller Test Name\",\"color\":\"red\",\"autoValue\":null,\"date\":\"2026-09-12\"}"
         ]
       },
       "react-virtualized": {
@@ -247,8 +298,8 @@
           "ok GlobalStyles (withStyles '@global'): color=rgb(255, 68, 0)",
           "custom StepIcon states rendered: [\"completed\",\"active\",\"default\"]",
           "theme.palette.primary applied to button: rgb(26, 43, 60)",
-          "JSS <style data-jss> sheets: 62",
-          "JSS duplicate sheets (same data-meta more than once): [[\"MuiButtonBase\",2],[\"MuiButton\",2],[\"MuiInputBase\",2],[\"MuiInput\",2],[\"MuiFormLabel\",2],[\"MuiInputLabel\",2],[\"MuiFormControl\",2],[\"MuiSvgIcon\",2],[\"MuiTextField\",2],[\"MuiDialog\",2],[\"MuiTooltip\",2],[\"makeStyles\",7],[\"MuiIconButton\",2],[\"MuiAutocomplete\",2],[\"MuiPickersModal\",2]]",
+          "JSS <style data-jss> sheets: 63",
+          "JSS duplicate sheets (same data-meta more than once): [[\"MuiButtonBase\",2],[\"MuiButton\",2],[\"MuiInputBase\",2],[\"MuiInput\",2],[\"MuiFormLabel\",2],[\"MuiInputLabel\",2],[\"MuiFormControl\",2],[\"MuiSvgIcon\",2],[\"MuiTextField\",2],[\"MuiDialog\",2],[\"MuiTooltip\",2],[\"makeStyles\",7],[\"MuiIconButton\",2],[\"MuiAutocomplete\",2],[\"MuiPickersModal\",2],[\"MuiInputAdornment\",2]]",
           "JSS dynamic $ conditional after click: borderWidth 4px -> 2px (expect a change)"
         ]
       },
@@ -277,6 +328,19 @@
           "final counter value: 401"
         ]
       },
+      "react-query": {
+        "name": "react-query",
+        "status": "ok",
+        "mounts": 1,
+        "unmounts": 0,
+        "notes": [
+          "frames observed: 121",
+          "torn frames (readers disagreed): 0",
+          "fetchCounter invocations (StrictMode would double this if not deduped): 1",
+          "final cached value: 1",
+          "after mutation click: reader A=\"9999\" reader B=\"9999\" (expect both \"9999\")"
+        ]
+      },
       "react-hook-form": {
         "name": "react-hook-form",
         "status": "ok",
@@ -284,6 +348,18 @@
         "unmounts": 0,
         "notes": [
           "registered fields (formState.errors keys type ok): true"
+        ]
+      },
+      "rhf-controller": {
+        "name": "rhf-controller",
+        "status": "ok",
+        "mounts": 1,
+        "unmounts": 0,
+        "notes": [
+          "formState.errors accessible: true",
+          "formState.errors accessible: true",
+          "formState.errors accessible: true",
+          "ok Controller+MUI submit: {\"name\":\"Controller Test Name\",\"color\":\"red\",\"autoValue\":null,\"date\":\"2026-09-12\"}"
         ]
       },
       "react-virtualized": {

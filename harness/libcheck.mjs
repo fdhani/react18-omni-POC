@@ -83,10 +83,41 @@ for (const cell of CELLS) {
     return el ? getComputedStyle(el).borderWidth : null;
   });
 
+  // React Query: trigger the mutation (setQueryData optimistic-update path)
+  // and confirm both cache readers pick up the new value -- an interaction
+  // test, not just the initial query load.
+  await page.click('[data-check="rq-mutate"]', { timeout: 5000 }).catch(() => {});
+  await page.waitForTimeout(400);
+  const rqAfterMutation = await page.evaluate(() => ({
+    a: document.querySelector('[data-rq-reader="a"]')?.textContent ?? null,
+    b: document.querySelector('[data-rq-reader="b"]')?.textContent ?? null,
+  }));
+
+  // react-hook-form + Controller + MUI: fill in the controlled inputs and
+  // submit, exercising the render-prop path (not just register()).
+  await page.fill('[data-check="rhf-textfield"] input', 'Controller Test Name').catch(() => {});
+  await page.click('[data-check="rhf-submit"]', { timeout: 5000 }).catch(() => {});
+  await page.waitForTimeout(200);
+  const rhfControllerSubmitted = await page.evaluate(
+    () => document.querySelector('[data-submitted-controller]')?.textContent ?? null,
+  );
+
   const results = await page.evaluate(() => window.__libResults ?? {});
   if (results['mui-theme']) {
     results['mui-theme'].notes.push(
       `JSS dynamic $ conditional after click: borderWidth ${jssBefore} -> ${jssAfter} (expect a change)`,
+    );
+  }
+  if (results['react-query']) {
+    results['react-query'].notes.push(
+      `after mutation click: reader A="${rqAfterMutation.a}" reader B="${rqAfterMutation.b}" (expect both "9999")`,
+    );
+  }
+  if (results['rhf-controller']) {
+    results['rhf-controller'].notes.push(
+      rhfControllerSubmitted
+        ? `ok Controller+MUI submit: ${rhfControllerSubmitted}`
+        : 'FAIL Controller+MUI submit: no submitted output found',
     );
   }
   const mode = await page.evaluate(() => window.__MODE__ ?? '?');

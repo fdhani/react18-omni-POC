@@ -7,7 +7,9 @@ import ReactSlickDemo from './ReactSlickDemo';
 import MuiLabDemo from './MuiLabDemo';
 import MuiPickersDemo from './MuiPickersDemo';
 import ReduxDemo from './ReduxDemo';
+import ReactQueryDemo from './ReactQueryDemo';
 import ReactHookFormDemo from './ReactHookFormDemo';
+import ReactHookFormControllerDemo from './ReactHookFormControllerDemo';
 import ReactVirtualizedDemo from './ReactVirtualizedDemo';
 
 const SECTIONS: Array<[string, React.ComponentType]> = [
@@ -16,7 +18,9 @@ const SECTIONS: Array<[string, React.ComponentType]> = [
   ['mui-lab', MuiLabDemo],
   ['mui-pickers', MuiPickersDemo],
   ['redux', ReduxDemo],
+  ['react-query', ReactQueryDemo],
   ['react-hook-form', ReactHookFormDemo],
+  ['rhf-controller', ReactHookFormControllerDemo],
   ['react-virtualized', ReactVirtualizedDemo],
   ['react-slick', ReactSlickDemo],
 ];

@@ -51,7 +51,7 @@
         "mounts": 1,
         "unmounts": 0,
         "notes": [
-          "react-virtualized/WindowScroller excluded from this demo: its dist/es build re-exports a Flow prop-type placeholder (bpfrpt_proptype_WindowScroller) that does not exist in the compiled output, which esbuild rejects outright -- `vite dev` and `vite build` both fail to even start with WindowScroller imported. Confirmed by a separate standalone build attempt, independent of React version."
+          "Imported via deep paths (react-virtualized/dist/commonjs/List, .../AutoSizer) rather than the package barrel -- avoids a confirmed esbuild/Rollup packaging bug in the barrel export (see source comment). Empirically independent of React version: same failure under React 17."
         ]
       }
     },
@@ -60,9 +60,9 @@
     "pageErrors": [],
     "consoleErrors": [
       "error: Warning: ReactDOM.render is no longer supported in React 18. Use createRoot instead. Until you switch to the new API, your app will behave as if it's running React 17. Learn more: https://reactjs.org/link/switch-to-createroot",
-      "error: Warning: %s: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.%s PickerWithState \n    at PickerWithState (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.js?v=03532034:2915:38)\n    at div\n    at MuiPickersUtilsProvider2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.",
-      "error: Warning: %s: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.%s ModalWrapper2 \n    at ModalWrapper2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.js?v=03532034:396:20)\n    at Wrapper2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.js?v=03532034:474:23)\n    at Pic",
-      "error: Warning: findDOMNode is deprecated and will be removed in the next major release. Instead, add a ref directly to the element you want to reference. Learn more about using refs safely here: https://reactjs.org/link/strict-mode-find-node%s \n    at button\n    at ButtonBase2 (http://localhost:5197/node_modules/.vite/deps/chunk-J5EUOFIK.js?v=03532034:421:22)\n    at WithStyles2 (http://localhost:"
+      "error: Warning: %s: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.%s PickerWithState \n    at PickerWithState (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.js?v=4457eb41:2915:38)\n    at div\n    at MuiPickersUtilsProvider2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.",
+      "error: Warning: %s: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.%s ModalWrapper2 \n    at ModalWrapper2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.js?v=4457eb41:396:20)\n    at Wrapper2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.js?v=4457eb41:474:23)\n    at Pic",
+      "error: Warning: findDOMNode is deprecated and will be removed in the next major release. Instead, add a ref directly to the element you want to reference. Learn more about using refs safely here: https://reactjs.org/link/strict-mode-find-node%s \n    at button\n    at ButtonBase2 (http://localhost:5197/node_modules/.vite/deps/chunk-UTKUW7QJ.js?v=319dde57:421:22)\n    at WithStyles2 (http://localhost:"
     ],
     "consoleWarnings": [],
     "bodyTextSample": "Dependency-stack smoke test — react18 + ReactDOM.render (legacy root)\nmui-core\nOPEN DIALOG\nOPEN MENU\nSHOW SNACKBAR\nText field\nA\nOPEN DRAWER\nmui-lab\nAutocomplete\n1\n2\n3\n4\n5\n1 Star\n2 Stars\n3 Stars\n4 Star"
@@ -99,7 +99,7 @@
         "mounts": 1,
         "unmounts": 0,
         "notes": [
-          "frames observed: 150",
+          "frames observed: 151",
           "torn frames (readers disagreed): 0",
           "final counter value: 401"
         ]
@@ -119,7 +119,7 @@
         "mounts": 1,
         "unmounts": 0,
         "notes": [
-          "react-virtualized/WindowScroller excluded from this demo: its dist/es build re-exports a Flow prop-type placeholder (bpfrpt_proptype_WindowScroller) that does not exist in the compiled output, which esbuild rejects outright -- `vite dev` and `vite build` both fail to even start with WindowScroller imported. Confirmed by a separate standalone build attempt, independent of React version."
+          "Imported via deep paths (react-virtualized/dist/commonjs/List, .../AutoSizer) rather than the package barrel -- avoids a confirmed esbuild/Rollup packaging bug in the barrel export (see source comment). Empirically independent of React version: same failure under React 17."
         ]
       }
     },
@@ -127,9 +127,9 @@
     "consoleWarningCount": 0,
     "pageErrors": [],
     "consoleErrors": [
-      "error: Warning: %s: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.%s PickerWithState \n    at PickerWithState (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.js?v=03532034:2915:38)\n    at div\n    at MuiPickersUtilsProvider2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.",
-      "error: Warning: %s: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.%s ModalWrapper2 \n    at ModalWrapper2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.js?v=03532034:396:20)\n    at Wrapper2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.js?v=03532034:474:23)\n    at Pic",
-      "error: Warning: findDOMNode is deprecated and will be removed in the next major release. Instead, add a ref directly to the element you want to reference. Learn more about using refs safely here: https://reactjs.org/link/strict-mode-find-node%s \n    at button\n    at ButtonBase2 (http://localhost:5197/node_modules/.vite/deps/chunk-J5EUOFIK.js?v=03532034:421:22)\n    at WithStyles2 (http://localhost:"
+      "error: Warning: %s: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.%s PickerWithState \n    at PickerWithState (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.js?v=4457eb41:2915:38)\n    at div\n    at MuiPickersUtilsProvider2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.",
+      "error: Warning: %s: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.%s ModalWrapper2 \n    at ModalWrapper2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.js?v=4457eb41:396:20)\n    at Wrapper2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.js?v=4457eb41:474:23)\n    at Pic",
+      "error: Warning: findDOMNode is deprecated and will be removed in the next major release. Instead, add a ref directly to the element you want to reference. Learn more about using refs safely here: https://reactjs.org/link/strict-mode-find-node%s \n    at button\n    at ButtonBase2 (http://localhost:5197/node_modules/.vite/deps/chunk-UTKUW7QJ.js?v=319dde57:421:22)\n    at WithStyles2 (http://localhost:"
     ],
     "consoleWarnings": [],
     "bodyTextSample": "Dependency-stack smoke test — react18 + createRoot\nmui-core\nOPEN DIALOG\nOPEN MENU\nSHOW SNACKBAR\nText field\nA\nOPEN DRAWER\nmui-lab\nAutocomplete\n1\n2\n3\n4\n5\n1 Star\n2 Stars\n3 Stars\n4 Stars\n5 Stars\nmui-picke"
@@ -187,8 +187,8 @@
         "mounts": 2,
         "unmounts": 1,
         "notes": [
-          "react-virtualized/WindowScroller excluded from this demo: its dist/es build re-exports a Flow prop-type placeholder (bpfrpt_proptype_WindowScroller) that does not exist in the compiled output, which esbuild rejects outright -- `vite dev` and `vite build` both fail to even start with WindowScroller imported. Confirmed by a separate standalone build attempt, independent of React version.",
-          "react-virtualized/WindowScroller excluded from this demo: its dist/es build re-exports a Flow prop-type placeholder (bpfrpt_proptype_WindowScroller) that does not exist in the compiled output, which esbuild rejects outright -- `vite dev` and `vite build` both fail to even start with WindowScroller imported. Confirmed by a separate standalone build attempt, independent of React version."
+          "Imported via deep paths (react-virtualized/dist/commonjs/List, .../AutoSizer) rather than the package barrel -- avoids a confirmed esbuild/Rollup packaging bug in the barrel export (see source comment). Empirically independent of React version: same failure under React 17.",
+          "Imported via deep paths (react-virtualized/dist/commonjs/List, .../AutoSizer) rather than the package barrel -- avoids a confirmed esbuild/Rollup packaging bug in the barrel export (see source comment). Empirically independent of React version: same failure under React 17."
         ]
       }
     },
@@ -196,9 +196,9 @@
     "consoleWarningCount": 0,
     "pageErrors": [],
     "consoleErrors": [
-      "error: Warning: %s: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.%s PickerWithState \n    at PickerWithState (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.js?v=03532034:2915:38)\n    at div\n    at MuiPickersUtilsProvider2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.",
-      "error: Warning: %s: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.%s ModalWrapper2 \n    at ModalWrapper2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.js?v=03532034:396:20)\n    at Wrapper2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.js?v=03532034:474:23)\n    at Pic",
-      "error: Warning: findDOMNode is deprecated and will be removed in the next major release. Instead, add a ref directly to the element you want to reference. Learn more about using refs safely here: https://reactjs.org/link/strict-mode-find-node%s \n    at button\n    at ButtonBase2 (http://localhost:5197/node_modules/.vite/deps/chunk-J5EUOFIK.js?v=03532034:421:22)\n    at WithStyles2 (http://localhost:"
+      "error: Warning: %s: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.%s PickerWithState \n    at PickerWithState (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.js?v=4457eb41:2915:38)\n    at div\n    at MuiPickersUtilsProvider2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.",
+      "error: Warning: %s: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.%s ModalWrapper2 \n    at ModalWrapper2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.js?v=4457eb41:396:20)\n    at Wrapper2 (http://localhost:5197/node_modules/.vite/deps/@material-ui_pickers.js?v=4457eb41:474:23)\n    at Pic",
+      "error: Warning: findDOMNode is deprecated and will be removed in the next major release. Instead, add a ref directly to the element you want to reference. Learn more about using refs safely here: https://reactjs.org/link/strict-mode-find-node%s \n    at button\n    at ButtonBase2 (http://localhost:5197/node_modules/.vite/deps/chunk-UTKUW7QJ.js?v=319dde57:421:22)\n    at WithStyles2 (http://localhost:"
     ],
     "consoleWarnings": [],
     "bodyTextSample": "Dependency-stack smoke test — react18 + createRoot + StrictMode\nmui-core\nOPEN DIALOG\nOPEN MENU\nSHOW SNACKBAR\nText field\nA\nOPEN DRAWER\nmui-lab\nAutocomplete\n1\n2\n3\n4\n5\n1 Star\n2 Stars\n3 Stars\n4 Stars\n5 St"

@@ -50,41 +50,58 @@ copy throughout — confirmed via `npm ls`.
 
 ## Two real, confirmed issues — neither is a React-18-crash
 
-### 1. `react-virtualized`'s default ESM build is broken under Vite/esbuild
+### 1. `react-virtualized`'s default ESM build is broken — confirmed independent of React version
 
-Not a React version issue — a packaging bug. `react-virtualized`'s `module`
-entry (`dist/es/index.js`) unconditionally re-exports `WindowScroller`, whose
-compiled output is missing a Flow prop-type placeholder export
-(`bpfrpt_proptype_WindowScroller`) that a sibling module still imports.
-esbuild rejects this outright: **`vite dev` and `vite build` fail to even
-start** as soon as anything is imported from `react-virtualized`'s default
-entry point — regardless of which named export is actually used, and
-regardless of React version.
+Not a React issue — a packaging bug, and I verified this claim directly rather
+than just asserting it: the exact same test was rerun in two isolated
+throwaway apps, one pinned to React 17.0.2 and one to React 18.3.1, both on
+the identical Vite version (5.4.11) used everywhere else in this repo.
+
+`react-virtualized`'s `module` entry (`dist/es/index.js`) unconditionally
+re-exports `WindowScroller`, whose compiled output is missing a Flow
+prop-type placeholder export (`bpfrpt_proptype_WindowScroller`) that a
+sibling module still imports:
 
 ```
 ✘ [ERROR] No matching export in ".../WindowScroller/WindowScroller.js"
   for import "bpfrpt_proptype_WindowScroller"
 ```
 
-Standard workaround, applied here (`vite.config.ts`):
+The precise, confirmed behavior — identical on React 17 and React 18:
+
+| | `vite dev` (esbuild dep pre-bundling) | `vite build` (Rollup) |
+|---|---|---|
+| `import { List } from 'react-virtualized'` (barrel) | **hard error, dev server never starts** | only a console warning, build still succeeds |
+| Deep import, e.g. `import List from 'react-virtualized/dist/commonjs/List'` | clean, no error | clean, no warning |
+
+So the bug is real, but it's neither universally fatal nor React-version-gated
+— it depends on (a) which of Vite's two bundlers is doing the resolving
+(esbuild for `dev`, Rollup for `build`), and (b) whether the broken barrel
+export is ever touched. **If another Vite + React app "just works" with
+`react-virtualized`, the likely explanation is that it deep-imports each
+component (or only ever runs `vite build`, never `vite dev`, against it) —
+not that it's on an earlier React version.**
+
+The fix applied here: deep-import each component directly, bypassing the
+broken barrel entirely —
 
 ```ts
-resolve: {
-  alias: [
-    { find: /^react-virtualized$/, replacement: 'react-virtualized/dist/commonjs/index.js' },
-  ],
-},
+import List from 'react-virtualized/dist/commonjs/List';
+import AutoSizer from 'react-virtualized/dist/commonjs/AutoSizer';
 ```
 
-This routes around esbuild's stricter ESM export resolution by pointing at
-the CommonJS build. Once aliased, the common `AutoSizer` + `List` combination
-renders correctly under all three cells. `WindowScroller` itself was left out
-of the demo — it's the actual source of the broken export and isn't needed to
-answer "does the library work under React 18."
+No `vite.config.ts` changes needed at all. (A project-wide alias to the
+CommonJS build, `{ find: /^react-virtualized$/, replacement:
+'react-virtualized/dist/commonjs/index.js' }`, also works and was the first
+fix tried — but it's a bigger hammer than necessary for a bug caused by one
+broken re-export.) `WindowScroller` itself was left out of the demo — it's
+the actual source of the broken export and isn't needed to answer "does the
+library work under React 18."
 
 **If your build tool is Vite (or any esbuild-based bundler) and you plan to
-use `react-virtualized`, you need this alias regardless of React version.**
-Webpack historically tolerated the dead import and wouldn't have hit this.
+use `react-virtualized`'s barrel import in dev mode, you'll hit this
+regardless of React version.** Webpack historically tolerated the dead import
+and wouldn't have hit this at all.
 
 ### 2. `react-hook-form@6.13.1`'s types don't resolve under modern TS
 

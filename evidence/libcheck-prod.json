@@ -51,7 +51,7 @@
         "mounts": 1,
         "unmounts": 0,
         "notes": [
-          "react-virtualized/WindowScroller excluded from this demo: its dist/es build re-exports a Flow prop-type placeholder (bpfrpt_proptype_WindowScroller) that does not exist in the compiled output, which esbuild rejects outright -- `vite dev` and `vite build` both fail to even start with WindowScroller imported. Confirmed by a separate standalone build attempt, independent of React version."
+          "Imported via deep paths (react-virtualized/dist/commonjs/List, .../AutoSizer) rather than the package barrel -- avoids a confirmed esbuild/Rollup packaging bug in the barrel export (see source comment). Empirically independent of React version: same failure under React 17."
         ]
       }
     },
@@ -114,7 +114,7 @@
         "mounts": 1,
         "unmounts": 0,
         "notes": [
-          "react-virtualized/WindowScroller excluded from this demo: its dist/es build re-exports a Flow prop-type placeholder (bpfrpt_proptype_WindowScroller) that does not exist in the compiled output, which esbuild rejects outright -- `vite dev` and `vite build` both fail to even start with WindowScroller imported. Confirmed by a separate standalone build attempt, independent of React version."
+          "Imported via deep paths (react-virtualized/dist/commonjs/List, .../AutoSizer) rather than the package barrel -- avoids a confirmed esbuild/Rollup packaging bug in the barrel export (see source comment). Empirically independent of React version: same failure under React 17."
         ]
       }
     },
@@ -157,7 +157,7 @@
         "mounts": 1,
         "unmounts": 0,
         "notes": [
-          "frames observed: 152",
+          "frames observed: 151",
           "torn frames (readers disagreed): 0",
           "final counter value: 401"
         ]
@@ -177,7 +177,7 @@
         "mounts": 1,
         "unmounts": 0,
         "notes": [
-          "react-virtualized/WindowScroller excluded from this demo: its dist/es build re-exports a Flow prop-type placeholder (bpfrpt_proptype_WindowScroller) that does not exist in the compiled output, which esbuild rejects outright -- `vite dev` and `vite build` both fail to even start with WindowScroller imported. Confirmed by a separate standalone build attempt, independent of React version."
+          "Imported via deep paths (react-virtualized/dist/commonjs/List, .../AutoSizer) rather than the package barrel -- avoids a confirmed esbuild/Rollup packaging bug in the barrel export (see source comment). Empirically independent of React version: same failure under React 17."
         ]
       }
     },

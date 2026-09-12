@@ -15,7 +15,6 @@ for (let i=0;i<40;i++){try{if((await fetch('http://localhost:4600/')).ok)break;}
 
 const browser = await chromium.launch();
 const urls = [
-  ['1', 'http://localhost:4600/r17/index.html?cell=1&pathB=1'],
   ['2', 'http://localhost:4600/r18/index.html?cell=2&pathB=1'],
   ['3', 'http://localhost:4600/r18/index.html?cell=3&pathB=1'],
   ['4', 'http://localhost:4600/r18/index.html?cell=4&pathB=1'],

@@ -14,8 +14,8 @@ import path from 'node:path';
  */
 const [, , cellArg] = process.argv;
 const cell = cellArg ?? '3';
-const app = cell === '1' ? 'app17' : 'app18';
-const port = cell === '1' ? 4517 : 4518;
+const app = 'app18';
+const port = 4518;
 const OUT = path.resolve(import.meta.dirname, '..', 'results');
 const root = path.resolve(import.meta.dirname, '..');
 

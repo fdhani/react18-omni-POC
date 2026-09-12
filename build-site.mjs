@@ -1,6 +1,5 @@
-// Combines the two app builds into one static site for Vercel.
-//   /r18/  -> React 18 bundle (cells 2, 3, 4 via ?cell=)
-//   /r17/  -> React 17 bundle (cell 1)
+// Builds the React 18 app into one static site for Vercel.
+//   /r18/  -> React 18.3.1 bundle (cells 2, 3, 4 via ?cell=)
 import { execSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -8,19 +7,15 @@ import path from 'node:path';
 const root = import.meta.dirname;
 const dist = path.join(root, 'dist');
 
-for (const app of ['app18', 'app17']) {
-  console.log(`building ${app}…`);
-  execSync('npx vite build', { cwd: path.join(root, app), stdio: 'inherit' });
-}
+console.log('building app18…');
+execSync('npx vite build', { cwd: path.join(root, 'app18'), stdio: 'inherit' });
 
 fs.rmSync(dist, { recursive: true, force: true });
 fs.mkdirSync(dist, { recursive: true });
 fs.cpSync(path.join(root, 'app18', 'dist'), path.join(dist, 'r18'), { recursive: true });
-fs.cpSync(path.join(root, 'app17', 'dist'), path.join(dist, 'r17'), { recursive: true });
 
 const cells = [
-  ['1', 'r17', 'React 17.0.2 · ReactDOM.render', 'Baseline control'],
-  ['2', 'r18', 'React 18.3.1 · ReactDOM.render (legacy root)', 'Isolates "React 18" from "concurrent root"'],
+  ['2', 'r18', 'React 18.3.1 · ReactDOM.render (legacy root)', 'Control — React 18 without a concurrent root'],
   ['3', 'r18', 'React 18.3.1 · createRoot', 'The hypothesis'],
   ['4', 'r18', 'React 18.3.1 · createRoot + StrictMode', 'Double-invoked effects'],
 ];
@@ -40,6 +35,9 @@ fs.writeFileSync(
  a{color:#0645ad}
 </style></head><body>
 <h1>react-stack-grid 0.7.1 × React 18 — reflow tear repro</h1>
+<p>React 18.3.1 only. Cell 2 is the control: React 18 with the legacy
+<code>ReactDOM.render</code> root, which React itself warns will
+&ldquo;behave as if it&rsquo;s running React 17&rdquo;.</p>
 <p>Each cell renders the same grid from the same source. Resize the window (Path A) or
 watch card 3 load after 800 ms (Path B). Per-frame instrumentation is on
 <code>window.__probe</code>; call <code>__probe.result()</code> in the console.</p>

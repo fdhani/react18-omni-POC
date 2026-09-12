@@ -1,6 +1,6 @@
 # react-stack-grid 0.7.1 × React 18 — reflow tear repro
 
-A standalone, throwaway reproduction testing one hypothesis:
+A standalone, throwaway reproduction testing one hypothesis, on **React 18.3.1 only**:
 
 > `react-stack-grid@0.7.1` positions its children by measuring the DOM and then
 > calling `setState`. Under a React 18 **concurrent root** (`createRoot`) that
@@ -8,32 +8,43 @@ A standalone, throwaway reproduction testing one hypothesis:
 > frame where the container has already resized but the children still carry
 > their previous `transform` — a visible flicker on every reflow.
 
-**Result: the hypothesis is not supported.** The tear is real and measurable, but
-it is *identical* under React 17, so it is pre-existing, not a React 18
-regression. A separate and worse problem *was* found in `StrictMode`. See
-[FINDINGS.md](./FINDINGS.md) for the numbers.
+**Result: the hypothesis is not supported.** The tear is real, measurable, and
+really painted — but it is identical under `createRoot` and under the legacy
+`ReactDOM.render` root. See [FINDINGS.md](./FINDINGS.md).
+
+A separate and worse problem *was* found in `StrictMode`.
+
+## Test matrix
+
+All cells are React 18.3.1. **Cell 2 is the control**: React 18 running the
+legacy `ReactDOM.render` root, which React itself warns will *"behave as if it's
+running React 17"*. Cell 2 vs cell 3 is therefore a direct isolation of
+"concurrent root" from "React 18".
+
+| Cell | Root API | StrictMode | Purpose |
+|---|---|---|---|
+| 2 | `ReactDOM.render` (legacy root) | off | Control — React 18 without a concurrent root |
+| 3 | `createRoot` | off | The hypothesis |
+| 4 | `createRoot` | on | Double-invoked effects |
 
 ## Layout
 
 ```
-shared/      one source tree used by both apps (App, probe, entrypoints)
-app18/       React 18.3.1  — cells 2, 3, 4  (?cell=2|3|4)
-app17/       React 17.0.2  — cell 1          (baseline control)
+shared/      app source (App, per-frame probe, entrypoint)
+app18/       React 18.3.1 + react-stack-grid 0.7.1
 harness/     Playwright driver + offline analyzers
-build-site.mjs  combines both builds into dist/ for static hosting
+build-site.mjs  builds the static site into dist/
 ```
 
-Both apps share `shared/` but pin `react` / `react-dom` to their own
-`node_modules` via Vite aliases, so the two React versions never mix.
+Installed with npm `overrides` to bypass the peer ranges of `react-sizeme` and
+`react-transition-group`, which do not declare React 18 support:
 
-## Test matrix
-
-| Cell | Root API | StrictMode | Purpose |
-|---|---|---|---|
-| 1 | React 17 `ReactDOM.render` | off | Baseline control |
-| 2 | React 18 `ReactDOM.render` | off | Isolates "React 18" from "concurrent root" |
-| 3 | React 18 `createRoot` | off | The hypothesis |
-| 4 | React 18 `createRoot` | on | Double-invoked effects |
+```
+react-stack-grid@0.7.1          peer react: >=15.3.0
+  ├─ react-sizeme@2.6.12        peer react: ^0.14 || ^15 || ^16
+  │    └─ element-resize-detector@1.2.4   (scroll strategy, not ResizeObserver)
+  └─ react-transition-group@1.2.1  peer react: ^15 || ^16
+```
 
 ## Triggers
 
@@ -42,8 +53,8 @@ Both apps share `shared/` but pin `react` / `react-dom` to their own
   throttled at 16 ms. A `setState` originating outside React's event system.
 - **Path B — imperative reflow.** A card resolves "data" after 800 ms, grows
   120 px, and calls `stackGridRef.updateLayout()` from a `useEffect`.
-  Needed because StackGrid sets `monitorHeight: false`, so a child growing
-  taller never triggers a reflow on its own.
+  Needed because StackGrid sets `monitorHeight: false` (`StackGrid.js:463-464`),
+  so a child growing taller never triggers a reflow on its own.
 
 ## Instrumentation
 
@@ -68,9 +79,9 @@ up as a longer tail here.
 
 ```bash
 npm run install:all
-npm run dev:18            # http://localhost:5173/?cell=3
-npm run build             # combined static site into dist/
-npm run measure           # Playwright, production build, all 4 cells
+npm run dev               # http://localhost:5173/?cell=3
+npm run build             # static site into dist/
+npm run measure           # Playwright, production build, all 3 cells
 npm run analyze
 ```
 
@@ -81,12 +92,13 @@ node harness/run.mjs prod 0 6      # mode(prod|dev)  duration  cards
 node harness/run.mjs prod 480 6    # library default duration=480
 node harness/run.mjs prod 0 60     # 60-card grid
 node harness/run.mjs dev 0 6       # dev build (React warnings visible)
-node harness/trace.mjs 3 4318      # DevTools trace: does a paint land in the tear?
+node harness/trace.mjs 3           # DevTools trace: does a paint land in the tear?
+node harness/verifydist.mjs        # assert a built dist/ renders every cell
 ```
 
 ### Query params
 
-`?cell=1|2|3|4` · `&pathB=0|1` · `&duration=<ms>` (react-stack-grid transition,
+`?cell=2|3|4` · `&pathB=0|1` · `&duration=<ms>` (react-stack-grid transition,
 default 0 here, library default 480) · `&cards=<n>` (default 6)
 
 ## Caveat on `duration`
@@ -99,31 +111,28 @@ matrix is therefore run at `duration={0}` to isolate the scheduling question;
 
 ## Deploying
 
-The repo is a zero-config static Vite SPA once built. From the repo root:
+Zero-config static Vite SPA. From the repo root:
 
 ```bash
 vercel --prod          # or: Import the repo in the Vercel dashboard
 ```
 
-`vercel.json` sets `buildCommand: npm run vercel-build` (installs both apps, then
-runs `build-site.mjs`) and `outputDirectory: dist`. The build is `vite build`, so
-what deploys is the **production** bundle — React's development warnings are
-compiled out, and StrictMode does not double-invoke effects.
+`vercel.json` sets `buildCommand: npm run vercel-build` and
+`outputDirectory: dist`. The build is `vite build`, so what deploys is the
+**production** bundle — React's development warnings are compiled out, and
+StrictMode does not double-invoke effects.
 
 Routes on the deployed site:
 
 | Cell | URL |
 |---|---|
 | landing | `/` |
-| 1 — React 17 | `/r17/index.html?cell=1&pathB=1` |
-| 2 — React 18 legacy root | `/r18/index.html?cell=2&pathB=1` |
-| 3 — React 18 `createRoot` | `/r18/index.html?cell=3&pathB=1` |
+| 2 — legacy root (control) | `/r18/index.html?cell=2&pathB=1` |
+| 3 — `createRoot` | `/r18/index.html?cell=3&pathB=1` |
 | 4 — `createRoot` + StrictMode | `/r18/index.html?cell=4&pathB=1` |
 
 Swap `pathB=1` for `pathB=0` to test Path A (resize) instead, and append
 `&duration=480` to see the library's default transition.
-
-To verify a built `dist/` locally: `node harness/verifydist.mjs`.
 
 ## Evidence
 

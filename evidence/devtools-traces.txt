@@ -1,18 +1,8 @@
-### TRACE cell 1
-{
-  "cell": "1",
-  "traceFile": "/home/user/react18-omni-POC/results/trace-cell1.json",
-  "traceEvents": 13487,
-  "tearWindows": 11,
-  "windowsContainingPaintOrFrame": 11,
-  "totalPaintEvents": 321,
-  "totalDrawFrameOrCommit": 88
-}
 ### TRACE cell 2
 {
   "cell": "2",
   "traceFile": "/home/user/react18-omni-POC/results/trace-cell2.json",
-  "traceEvents": 13561,
+  "traceEvents": 13606,
   "tearWindows": 11,
   "windowsContainingPaintOrFrame": 11,
   "totalPaintEvents": 322,
@@ -22,7 +12,7 @@
 {
   "cell": "3",
   "traceFile": "/home/user/react18-omni-POC/results/trace-cell3.json",
-  "traceEvents": 13952,
+  "traceEvents": 13941,
   "tearWindows": 11,
   "windowsContainingPaintOrFrame": 11,
   "totalPaintEvents": 317,

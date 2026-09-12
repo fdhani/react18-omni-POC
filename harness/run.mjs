@@ -12,7 +12,7 @@ const CARDS = process.argv[4] ?? '6';
 const OUT = path.join(root, 'results');
 fs.mkdirSync(OUT, { recursive: true });
 
-const PORTS = { app18: MODE === 'dev' ? 5318 : 4318, app17: MODE === 'dev' ? 5317 : 4317 };
+const PORTS = { app18: MODE === 'dev' ? 5318 : 4318 };
 
 function startServer(app) {
   const port = PORTS[app];
@@ -115,20 +115,17 @@ async function runCell({ browser, cell, url, path: pathName, video }) {
 }
 
 await waitPortFree(PORTS.app18);
-await waitPortFree(PORTS.app17);
-const servers = [startServer('app18'), startServer('app17')];
+const servers = [startServer('app18')];
 process.on('exit', () => { for (const s of servers) { try { process.kill(-s.pid, 'SIGKILL'); } catch {} } });
 
 try {
   await waitFor(`http://localhost:${PORTS.app18}/`);
-  await waitFor(`http://localhost:${PORTS.app17}/`);
 
   const browser = await chromium.launch({ args: ['--force-device-scale-factor=1'] });
   const q = (cell, pathName) =>
     `cell=${cell}&pathB=${pathName === 'B' ? 1 : 0}&duration=${DURATION}&cards=${CARDS}`;
 
   const cells = [
-    { cell: '1', base: `http://localhost:${PORTS.app17}/` },
     { cell: '2', base: `http://localhost:${PORTS.app18}/` },
     { cell: '3', base: `http://localhost:${PORTS.app18}/` },
     { cell: '4', base: `http://localhost:${PORTS.app18}/` },
@@ -137,7 +134,7 @@ try {
   const all = [];
   for (const { cell, base } of cells) {
     for (const pathName of ['A', 'B']) {
-      const video = pathName === 'A' && (cell === '1' || cell === '3');
+      const video = pathName === 'A' && (cell === '2' || cell === '3');
       const r = await runCell({ browser, cell, url: `${base}?${q(cell, pathName)}`, path: pathName, video });
       all.push(r);
       console.log(

@@ -1,54 +1,15 @@
 [
   {
-    "cell": "1",
-    "trigger": "A",
-    "react": "17.0.2",
-    "mode": "react17 + ReactDOM.render",
-    "frames": 317,
-    "widthChanges": 17,
-    "lagFramesMedian": 0,
-    "lagFramesMax": 2,
-    "lagMsMedian": 0,
-    "lagMsMax": 26,
-    "jumpPxMedian": 0,
-    "jumpPxMax": 3,
-    "lagHistogram": {
-      "0": 16,
-      "2": 1
-    },
-    "tornFramesWidth": 1,
-    "overlapFrames": 34,
-    "consoleCount": 0
-  },
-  {
-    "cell": "1",
-    "trigger": "B",
-    "react": "17.0.2",
-    "mode": "react17 + ReactDOM.render",
-    "frames": 152,
-    "widthChanges": 0,
-    "lagFramesMedian": 0,
-    "lagFramesMax": 0,
-    "lagMsMedian": 0,
-    "lagMsMax": 0,
-    "jumpPxMedian": 0,
-    "jumpPxMax": 0,
-    "lagHistogram": {},
-    "tornFramesWidth": 0,
-    "overlapFrames": 28,
-    "consoleCount": 0
-  },
-  {
     "cell": "2",
     "trigger": "A",
     "react": "18.3.1",
     "mode": "react18 + ReactDOM.render (legacy root)",
-    "frames": 317,
+    "frames": 319,
     "widthChanges": 17,
     "lagFramesMedian": 0,
     "lagFramesMax": 2,
     "lagMsMedian": 0,
-    "lagMsMax": 32,
+    "lagMsMax": 33,
     "jumpPxMedian": 0,
     "jumpPxMax": 3,
     "lagHistogram": {
@@ -82,12 +43,12 @@
     "trigger": "A",
     "react": "18.3.1",
     "mode": "react18 + createRoot",
-    "frames": 317,
+    "frames": 316,
     "widthChanges": 17,
     "lagFramesMedian": 0,
     "lagFramesMax": 3,
     "lagMsMedian": 0,
-    "lagMsMax": 50,
+    "lagMsMax": 43,
     "jumpPxMedian": 0,
     "jumpPxMax": 3,
     "lagHistogram": {
@@ -95,7 +56,7 @@
       "3": 1
     },
     "tornFramesWidth": 1,
-    "overlapFrames": 35,
+    "overlapFrames": 34,
     "consoleCount": 0
   },
   {
@@ -121,12 +82,12 @@
     "trigger": "A",
     "react": "18.3.1",
     "mode": "react18 + createRoot + StrictMode",
-    "frames": 316,
+    "frames": 315,
     "widthChanges": 17,
     "lagFramesMedian": 0,
     "lagFramesMax": 3,
     "lagMsMedian": 0,
-    "lagMsMax": 49,
+    "lagMsMax": 47,
     "jumpPxMedian": 0,
     "jumpPxMax": 3,
     "lagHistogram": {
@@ -134,7 +95,7 @@
       "3": 1
     },
     "tornFramesWidth": 1,
-    "overlapFrames": 35,
+    "overlapFrames": 34,
     "consoleCount": 0
   },
   {
@@ -142,7 +103,7 @@
     "trigger": "B",
     "react": "18.3.1",
     "mode": "react18 + createRoot + StrictMode",
-    "frames": 150,
+    "frames": 151,
     "widthChanges": 0,
     "lagFramesMedian": 0,
     "lagFramesMax": 0,
@@ -152,7 +113,7 @@
     "jumpPxMax": 0,
     "lagHistogram": {},
     "tornFramesWidth": 0,
-    "overlapFrames": 28,
+    "overlapFrames": 29,
     "consoleCount": 0
   }
 ]

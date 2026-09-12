@@ -1,53 +1,15 @@
 [
   {
-    "cell": "1",
-    "trigger": "A",
-    "react": "17.0.2",
-    "mode": "react17 + ReactDOM.render",
-    "frames": 318,
-    "widthChanges": 17,
-    "lagFramesMedian": 2,
-    "lagFramesMax": 2,
-    "lagMsMedian": 33,
-    "lagMsMax": 35,
-    "jumpPxMedian": 20,
-    "jumpPxMax": 30,
-    "lagHistogram": {
-      "2": 17
-    },
-    "tornFramesWidth": 17,
-    "overlapFrames": 7,
-    "consoleCount": 0
-  },
-  {
-    "cell": "1",
-    "trigger": "B",
-    "react": "17.0.2",
-    "mode": "react17 + ReactDOM.render",
-    "frames": 151,
-    "widthChanges": 0,
-    "lagFramesMedian": 0,
-    "lagFramesMax": 0,
-    "lagMsMedian": 0,
-    "lagMsMax": 0,
-    "jumpPxMedian": 0,
-    "jumpPxMax": 0,
-    "lagHistogram": {},
-    "tornFramesWidth": 0,
-    "overlapFrames": 2,
-    "consoleCount": 0
-  },
-  {
     "cell": "2",
     "trigger": "A",
     "react": "18.3.1",
     "mode": "react18 + ReactDOM.render (legacy root)",
-    "frames": 318,
+    "frames": 319,
     "widthChanges": 17,
     "lagFramesMedian": 2,
     "lagFramesMax": 2,
     "lagMsMedian": 33,
-    "lagMsMax": 33,
+    "lagMsMax": 34,
     "jumpPxMedian": 20,
     "jumpPxMax": 30,
     "lagHistogram": {
@@ -80,19 +42,19 @@
     "trigger": "A",
     "react": "18.3.1",
     "mode": "react18 + createRoot",
-    "frames": 316,
+    "frames": 315,
     "widthChanges": 17,
     "lagFramesMedian": 2,
     "lagFramesMax": 2,
     "lagMsMedian": 33,
-    "lagMsMax": 39,
+    "lagMsMax": 44,
     "jumpPxMedian": 20,
     "jumpPxMax": 30,
     "lagHistogram": {
       "2": 17
     },
     "tornFramesWidth": 17,
-    "overlapFrames": 7,
+    "overlapFrames": 6,
     "consoleCount": 0
   },
   {
@@ -100,7 +62,7 @@
     "trigger": "B",
     "react": "18.3.1",
     "mode": "react18 + createRoot",
-    "frames": 151,
+    "frames": 150,
     "widthChanges": 0,
     "lagFramesMedian": 0,
     "lagFramesMax": 0,
@@ -110,7 +72,7 @@
     "jumpPxMax": 0,
     "lagHistogram": {},
     "tornFramesWidth": 0,
-    "overlapFrames": 2,
+    "overlapFrames": 1,
     "consoleCount": 0
   },
   {
@@ -123,7 +85,7 @@
     "lagFramesMedian": 2,
     "lagFramesMax": 2,
     "lagMsMedian": 33,
-    "lagMsMax": 34,
+    "lagMsMax": 33,
     "jumpPxMedian": 20,
     "jumpPxMax": 30,
     "lagHistogram": {

@@ -96,3 +96,37 @@ default 0 here, library default 480) · `&cards=<n>` (default 6)
 design for ~480 ms on every reflow, which swamps any scheduling effect. The
 matrix is therefore run at `duration={0}` to isolate the scheduling question;
 `duration=480` is measured separately.
+
+## Deploying
+
+The repo is a zero-config static Vite SPA once built. From the repo root:
+
+```bash
+vercel --prod          # or: Import the repo in the Vercel dashboard
+```
+
+`vercel.json` sets `buildCommand: npm run vercel-build` (installs both apps, then
+runs `build-site.mjs`) and `outputDirectory: dist`. The build is `vite build`, so
+what deploys is the **production** bundle — React's development warnings are
+compiled out, and StrictMode does not double-invoke effects.
+
+Routes on the deployed site:
+
+| Cell | URL |
+|---|---|
+| landing | `/` |
+| 1 — React 17 | `/r17/index.html?cell=1&pathB=1` |
+| 2 — React 18 legacy root | `/r18/index.html?cell=2&pathB=1` |
+| 3 — React 18 `createRoot` | `/r18/index.html?cell=3&pathB=1` |
+| 4 — `createRoot` + StrictMode | `/r18/index.html?cell=4&pathB=1` |
+
+Swap `pathB=1` for `pathB=0` to test Path A (resize) instead, and append
+`&duration=480` to see the library's default transition.
+
+To verify a built `dist/` locally: `node harness/verifydist.mjs`.
+
+## Evidence
+
+`evidence/` holds the distilled analyses, run logs and confirmation videos.
+Raw per-frame dumps and DevTools traces are gitignored (1.5–12 MB each);
+regenerate them with `npm run measure` and `node harness/trace.mjs 3`.

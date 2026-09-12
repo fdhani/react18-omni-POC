@@ -1,0 +1,19 @@
+/*
+ * Matches the real app's ReactSlickStyles.css: a plain, hand-written CSS
+ * file layered on top of a third-party library's own plain CSS
+ * (slick-carousel's slick.css / slick-theme.css) and MUI's JSS output --
+ * three different styling mechanisms coexisting on one component, which is
+ * exactly the CSS-injection-order risk the dependency-upgrade investigation
+ * names in section 6.3 ("JSS and Emotion must use the correct CSS injection
+ * order"). Import order in the demo file matters here: this file is
+ * imported AFTER slick's own CSS, so these rules should win the cascade at
+ * equal specificity by source order, same as the real app's setup.
+ */
+[data-slick-demo] .slick-dots li button:before {
+  color: #ff00aa;
+  font-size: 14px;
+  opacity: 1;
+}
+[data-slick-demo] .slick-dots li.slick-active button:before {
+  color: #00aaff;
+}

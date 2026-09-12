@@ -3,6 +3,7 @@ import { CellSwitcher, ViewSwitcher } from '../Nav';
 import { ErrorBoundary } from './ErrorBoundary';
 import MuiCoreDemo from './MuiCoreDemo';
 import MuiThemeDemo from './MuiThemeDemo';
+import ReactSlickDemo from './ReactSlickDemo';
 import MuiLabDemo from './MuiLabDemo';
 import MuiPickersDemo from './MuiPickersDemo';
 import ReduxDemo from './ReduxDemo';
@@ -17,6 +18,7 @@ const SECTIONS: Array<[string, React.ComponentType]> = [
   ['redux', ReduxDemo],
   ['react-hook-form', ReactHookFormDemo],
   ['react-virtualized', ReactVirtualizedDemo],
+  ['react-slick', ReactSlickDemo],
 ];
 
 /**

@@ -19,15 +19,131 @@
         "notes": [
           "ok MuiAlert override: expected #123456 (rgb(18, 52, 86)) got=rgb(18, 52, 86)",
           "ok MuiAutocomplete override: expected #00aa55 (rgb(0, 170, 85)) got=rgb(0, 170, 85)",
+          "ok MuiDivider override: expected #ff00aa (rgb(255, 0, 170)) got=rgb(255, 0, 170)",
           "ok MuiPaper override: expected #fef3e0 (rgb(254, 243, 224)) got=rgb(254, 243, 224)",
           "ok MuiTooltip override: expected #2d0033 (rgb(45, 0, 51)) got=rgb(45, 0, 51)",
           "ok MuiAvatar override: expected #004488 (rgb(0, 68, 136)) got=rgb(0, 68, 136)",
           "ok MuiLinearProgress override: expected #cc0066 (rgb(204, 0, 102)) got=rgb(204, 0, 102)",
           "ok MuiBackdrop (Modal) override: expected rgba(10, 20, 30, 0.85) (rgba(10, 20, 30, 0.85)) got=rgba(10, 20, 30, 0.85)",
           "ok MuiStepper override: expected #f0f8ff (rgb(240, 248, 255)) got=rgb(240, 248, 255)",
+          "ok MuiStepConnector override: expected #009999 (rgb(0, 153, 153)) got=rgb(0, 153, 153)",
+          "ok MuiStepLabel override: expected #663300 (rgb(102, 51, 0)) got=rgb(102, 51, 0)",
+          "ok props.MuiAlert variant=\"filled\" applied (MuiAlert-filled* class present)",
+          "ok props.MuiTooltip arrow=true applied (.MuiTooltip-arrow present)",
+          "ok props.MuiModal disablePortal=true applied (modal rendered inline, not portaled to body)",
+          "custom palette swatches (icon/calendarBackground/inputBackground/filter/background.subtle): [\"rgb(51, 102, 153)\",\"rgb(224, 255, 224)\",\"rgb(245, 245, 250)\",\"rgb(0, 204, 102)\",\"rgb(240, 240, 245)\"]",
+          "useTheme() Theme/ThemeOptions augmentation: boxShadow=rgba(255, 0, 170, 0.6) 0px 4px 12px 0px... borderRadius=5px",
+          "ok styled() API: borderColor=rgb(0, 105, 92)",
+          "ok GlobalStyles (withStyles '@global'): color=rgb(255, 68, 0)",
+          "custom StepIcon states rendered: [\"completed\",\"active\",\"default\"]",
           "theme.palette.primary applied to button: rgb(26, 43, 60)",
-          "JSS <style data-jss> sheets: 58",
-          "JSS duplicate sheets (same data-meta more than once): [[\"MuiTouchRipple\",2],[\"MuiButtonBase\",2],[\"MuiInputBase\",2],[\"MuiFormLabel\",2],[\"MuiInputLabel\",2],[\"MuiFormControl\",2],[\"MuiSvgIcon\",2],[\"MuiTextField\",2],[\"MuiDialog\",2],[\"MuiTooltip\",2],[\"makeStyles\",3],[\"MuiIconButton\",2],[\"MuiAutocomplete\",2],[\"MuiPickersModal\",2]]",
+          "JSS <style data-jss> sheets: 64",
+          "JSS duplicate sheets (same data-meta more than once): [[\"MuiTouchRipple\",2],[\"MuiButtonBase\",2],[\"MuiButton\",2],[\"MuiInputBase\",2],[\"MuiInput\",2],[\"MuiFormLabel\",2],[\"MuiInputLabel\",2],[\"MuiFormControl\",2],[\"MuiSvgIcon\",2],[\"MuiTextField\",2],[\"MuiDialog\",2],[\"MuiTooltip\",2],[\"makeStyles\",7],[\"MuiIconButton\",2],[\"MuiAutocomplete\",2],[\"MuiPickersModal\",2]]",
+          "JSS dynamic $ conditional after click: borderWidth 4px -> 2px (expect a change)"
+        ]
+      },
+      "mui-lab": {
+        "name": "mui-lab",
+        "status": "ok",
+        "mounts": 1,
+        "unmounts": 0,
+        "notes": []
+      },
+      "mui-pickers": {
+        "name": "mui-pickers",
+        "status": "ok",
+        "mounts": 1,
+        "unmounts": 0,
+        "notes": []
+      },
+      "redux": {
+        "name": "redux",
+        "status": "ok",
+        "mounts": 1,
+        "unmounts": 0,
+        "notes": [
+          "frames observed: 151",
+          "torn frames (readers disagreed): 0",
+          "final counter value: 401"
+        ]
+      },
+      "react-hook-form": {
+        "name": "react-hook-form",
+        "status": "ok",
+        "mounts": 1,
+        "unmounts": 0,
+        "notes": [
+          "registered fields (formState.errors keys type ok): true"
+        ]
+      },
+      "react-virtualized": {
+        "name": "react-virtualized",
+        "status": "ok",
+        "mounts": 1,
+        "unmounts": 0,
+        "notes": [
+          "Imported via deep paths (react-virtualized/dist/commonjs/List, .../AutoSizer) rather than the package barrel -- avoids a confirmed esbuild/Rollup packaging bug in the barrel export (see source comment). Empirically independent of React version: same failure under React 17."
+        ]
+      },
+      "react-slick": {
+        "name": "react-slick",
+        "status": "ok",
+        "mounts": 1,
+        "unmounts": 0,
+        "notes": [
+          "ok active slick dot ::before color (custom CSS beating slick-theme.css default)",
+          "ok inactive slick dot ::before color (custom CSS beating slick-theme.css default)",
+          "JSS-styled slide background (expect rgb(238, 238, 255)): rgb(238, 238, 255)"
+        ]
+      }
+    },
+    "consoleErrorCount": 0,
+    "consoleWarningCount": 0,
+    "pageErrors": [],
+    "consoleErrors": [],
+    "consoleWarnings": [],
+    "bodyTextSample": "Dependency-stack smoke test — react18 + ReactDOM.render (legacy root)\npage:\nstack-grid repro\ndependency-stack smoke test\ncell:\n2 — ReactDOM.render (control)\n3 — createRoot\n4 — createRoot + StrictMode\n"
+  },
+  "3": {
+    "cell": "3",
+    "mode": "react18 + createRoot",
+    "reactVersion": "18.3.1",
+    "results": {
+      "mui-core": {
+        "name": "mui-core",
+        "status": "ok",
+        "mounts": 1,
+        "unmounts": 0,
+        "notes": []
+      },
+      "mui-theme": {
+        "name": "mui-theme",
+        "status": "ok",
+        "mounts": 1,
+        "unmounts": 0,
+        "notes": [
+          "ok MuiAlert override: expected #123456 (rgb(18, 52, 86)) got=rgb(18, 52, 86)",
+          "ok MuiAutocomplete override: expected #00aa55 (rgb(0, 170, 85)) got=rgb(0, 170, 85)",
+          "ok MuiDivider override: expected #ff00aa (rgb(255, 0, 170)) got=rgb(255, 0, 170)",
+          "ok MuiPaper override: expected #fef3e0 (rgb(254, 243, 224)) got=rgb(254, 243, 224)",
+          "ok MuiTooltip override: expected #2d0033 (rgb(45, 0, 51)) got=rgb(45, 0, 51)",
+          "ok MuiAvatar override: expected #004488 (rgb(0, 68, 136)) got=rgb(0, 68, 136)",
+          "ok MuiLinearProgress override: expected #cc0066 (rgb(204, 0, 102)) got=rgb(204, 0, 102)",
+          "ok MuiBackdrop (Modal) override: expected rgba(10, 20, 30, 0.85) (rgba(10, 20, 30, 0.85)) got=rgba(10, 20, 30, 0.85)",
+          "ok MuiStepper override: expected #f0f8ff (rgb(240, 248, 255)) got=rgb(240, 248, 255)",
+          "ok MuiStepConnector override: expected #009999 (rgb(0, 153, 153)) got=rgb(0, 153, 153)",
+          "ok MuiStepLabel override: expected #663300 (rgb(102, 51, 0)) got=rgb(102, 51, 0)",
+          "ok props.MuiAlert variant=\"filled\" applied (MuiAlert-filled* class present)",
+          "ok props.MuiTooltip arrow=true applied (.MuiTooltip-arrow present)",
+          "ok props.MuiModal disablePortal=true applied (modal rendered inline, not portaled to body)",
+          "custom palette swatches (icon/calendarBackground/inputBackground/filter/background.subtle): [\"rgb(51, 102, 153)\",\"rgb(224, 255, 224)\",\"rgb(245, 245, 250)\",\"rgb(0, 204, 102)\",\"rgb(240, 240, 245)\"]",
+          "useTheme() Theme/ThemeOptions augmentation: boxShadow=rgba(255, 0, 170, 0.6) 0px 4px 12px 0px... borderRadius=5px",
+          "ok styled() API: borderColor=rgb(0, 105, 92)",
+          "ok GlobalStyles (withStyles '@global'): color=rgb(255, 68, 0)",
+          "custom StepIcon states rendered: [\"completed\",\"active\",\"default\"]",
+          "theme.palette.primary applied to button: rgb(26, 43, 60)",
+          "JSS <style data-jss> sheets: 62",
+          "JSS duplicate sheets (same data-meta more than once): [[\"MuiButtonBase\",2],[\"MuiButton\",2],[\"MuiInputBase\",2],[\"MuiInput\",2],[\"MuiFormLabel\",2],[\"MuiInputLabel\",2],[\"MuiFormControl\",2],[\"MuiSvgIcon\",2],[\"MuiTextField\",2],[\"MuiDialog\",2],[\"MuiTooltip\",2],[\"makeStyles\",7],[\"MuiIconButton\",2],[\"MuiAutocomplete\",2],[\"MuiPickersModal\",2]]",
           "JSS dynamic $ conditional after click: borderWidth 4px -> 2px (expect a change)"
         ]
       },
@@ -73,88 +189,16 @@
         "notes": [
           "Imported via deep paths (react-virtualized/dist/commonjs/List, .../AutoSizer) rather than the package barrel -- avoids a confirmed esbuild/Rollup packaging bug in the barrel export (see source comment). Empirically independent of React version: same failure under React 17."
         ]
-      }
-    },
-    "consoleErrorCount": 0,
-    "consoleWarningCount": 0,
-    "pageErrors": [],
-    "consoleErrors": [],
-    "consoleWarnings": [],
-    "bodyTextSample": "Dependency-stack smoke test — react18 + ReactDOM.render (legacy root)\npage:\nstack-grid repro\ndependency-stack smoke test\ncell:\n2 — ReactDOM.render (control)\n3 — createRoot\n4 — createRoot + StrictMode\n"
-  },
-  "3": {
-    "cell": "3",
-    "mode": "react18 + createRoot",
-    "reactVersion": "18.3.1",
-    "results": {
-      "mui-core": {
-        "name": "mui-core",
-        "status": "ok",
-        "mounts": 1,
-        "unmounts": 0,
-        "notes": []
       },
-      "mui-theme": {
-        "name": "mui-theme",
+      "react-slick": {
+        "name": "react-slick",
         "status": "ok",
         "mounts": 1,
         "unmounts": 0,
         "notes": [
-          "ok MuiAlert override: expected #123456 (rgb(18, 52, 86)) got=rgb(18, 52, 86)",
-          "ok MuiAutocomplete override: expected #00aa55 (rgb(0, 170, 85)) got=rgb(0, 170, 85)",
-          "ok MuiPaper override: expected #fef3e0 (rgb(254, 243, 224)) got=rgb(254, 243, 224)",
-          "ok MuiTooltip override: expected #2d0033 (rgb(45, 0, 51)) got=rgb(45, 0, 51)",
-          "ok MuiAvatar override: expected #004488 (rgb(0, 68, 136)) got=rgb(0, 68, 136)",
-          "ok MuiLinearProgress override: expected #cc0066 (rgb(204, 0, 102)) got=rgb(204, 0, 102)",
-          "ok MuiBackdrop (Modal) override: expected rgba(10, 20, 30, 0.85) (rgba(10, 20, 30, 0.85)) got=rgba(10, 20, 30, 0.85)",
-          "ok MuiStepper override: expected #f0f8ff (rgb(240, 248, 255)) got=rgb(240, 248, 255)",
-          "theme.palette.primary applied to button: rgb(26, 43, 60)",
-          "JSS <style data-jss> sheets: 56",
-          "JSS duplicate sheets (same data-meta more than once): [[\"MuiButtonBase\",2],[\"MuiInputBase\",2],[\"MuiFormLabel\",2],[\"MuiInputLabel\",2],[\"MuiFormControl\",2],[\"MuiSvgIcon\",2],[\"MuiTextField\",2],[\"MuiDialog\",2],[\"MuiTooltip\",2],[\"makeStyles\",3],[\"MuiIconButton\",2],[\"MuiAutocomplete\",2],[\"MuiPickersModal\",2]]",
-          "JSS dynamic $ conditional after click: borderWidth 4px -> 2px (expect a change)"
-        ]
-      },
-      "mui-lab": {
-        "name": "mui-lab",
-        "status": "ok",
-        "mounts": 1,
-        "unmounts": 0,
-        "notes": []
-      },
-      "mui-pickers": {
-        "name": "mui-pickers",
-        "status": "ok",
-        "mounts": 1,
-        "unmounts": 0,
-        "notes": []
-      },
-      "redux": {
-        "name": "redux",
-        "status": "ok",
-        "mounts": 1,
-        "unmounts": 0,
-        "notes": [
-          "frames observed: 151",
-          "torn frames (readers disagreed): 0",
-          "final counter value: 401"
-        ]
-      },
-      "react-hook-form": {
-        "name": "react-hook-form",
-        "status": "ok",
-        "mounts": 1,
-        "unmounts": 0,
-        "notes": [
-          "registered fields (formState.errors keys type ok): true"
-        ]
-      },
-      "react-virtualized": {
-        "name": "react-virtualized",
-        "status": "ok",
-        "mounts": 1,
-        "unmounts": 0,
-        "notes": [
-          "Imported via deep paths (react-virtualized/dist/commonjs/List, .../AutoSizer) rather than the package barrel -- avoids a confirmed esbuild/Rollup packaging bug in the barrel export (see source comment). Empirically independent of React version: same failure under React 17."
+          "ok active slick dot ::before color (custom CSS beating slick-theme.css default)",
+          "ok inactive slick dot ::before color (custom CSS beating slick-theme.css default)",
+          "JSS-styled slide background (expect rgb(238, 238, 255)): rgb(238, 238, 255)"
         ]
       }
     },
@@ -185,15 +229,26 @@
         "notes": [
           "ok MuiAlert override: expected #123456 (rgb(18, 52, 86)) got=rgb(18, 52, 86)",
           "ok MuiAutocomplete override: expected #00aa55 (rgb(0, 170, 85)) got=rgb(0, 170, 85)",
+          "ok MuiDivider override: expected #ff00aa (rgb(255, 0, 170)) got=rgb(255, 0, 170)",
           "ok MuiPaper override: expected #fef3e0 (rgb(254, 243, 224)) got=rgb(254, 243, 224)",
           "ok MuiTooltip override: expected #2d0033 (rgb(45, 0, 51)) got=rgb(45, 0, 51)",
           "ok MuiAvatar override: expected #004488 (rgb(0, 68, 136)) got=rgb(0, 68, 136)",
           "ok MuiLinearProgress override: expected #cc0066 (rgb(204, 0, 102)) got=rgb(204, 0, 102)",
           "ok MuiBackdrop (Modal) override: expected rgba(10, 20, 30, 0.85) (rgba(10, 20, 30, 0.85)) got=rgba(10, 20, 30, 0.85)",
           "ok MuiStepper override: expected #f0f8ff (rgb(240, 248, 255)) got=rgb(240, 248, 255)",
+          "ok MuiStepConnector override: expected #009999 (rgb(0, 153, 153)) got=rgb(0, 153, 153)",
+          "ok MuiStepLabel override: expected #663300 (rgb(102, 51, 0)) got=rgb(102, 51, 0)",
+          "ok props.MuiAlert variant=\"filled\" applied (MuiAlert-filled* class present)",
+          "ok props.MuiTooltip arrow=true applied (.MuiTooltip-arrow present)",
+          "ok props.MuiModal disablePortal=true applied (modal rendered inline, not portaled to body)",
+          "custom palette swatches (icon/calendarBackground/inputBackground/filter/background.subtle): [\"rgb(51, 102, 153)\",\"rgb(224, 255, 224)\",\"rgb(245, 245, 250)\",\"rgb(0, 204, 102)\",\"rgb(240, 240, 245)\"]",
+          "useTheme() Theme/ThemeOptions augmentation: boxShadow=rgba(255, 0, 170, 0.6) 0px 4px 12px 0px... borderRadius=5px",
+          "ok styled() API: borderColor=rgb(0, 105, 92)",
+          "ok GlobalStyles (withStyles '@global'): color=rgb(255, 68, 0)",
+          "custom StepIcon states rendered: [\"completed\",\"active\",\"default\"]",
           "theme.palette.primary applied to button: rgb(26, 43, 60)",
-          "JSS <style data-jss> sheets: 56",
-          "JSS duplicate sheets (same data-meta more than once): [[\"MuiButtonBase\",2],[\"MuiInputBase\",2],[\"MuiFormLabel\",2],[\"MuiInputLabel\",2],[\"MuiFormControl\",2],[\"MuiSvgIcon\",2],[\"MuiTextField\",2],[\"MuiDialog\",2],[\"MuiTooltip\",2],[\"makeStyles\",3],[\"MuiIconButton\",2],[\"MuiAutocomplete\",2],[\"MuiPickersModal\",2]]",
+          "JSS <style data-jss> sheets: 62",
+          "JSS duplicate sheets (same data-meta more than once): [[\"MuiButtonBase\",2],[\"MuiButton\",2],[\"MuiInputBase\",2],[\"MuiInput\",2],[\"MuiFormLabel\",2],[\"MuiInputLabel\",2],[\"MuiFormControl\",2],[\"MuiSvgIcon\",2],[\"MuiTextField\",2],[\"MuiDialog\",2],[\"MuiTooltip\",2],[\"makeStyles\",7],[\"MuiIconButton\",2],[\"MuiAutocomplete\",2],[\"MuiPickersModal\",2]]",
           "JSS dynamic $ conditional after click: borderWidth 4px -> 2px (expect a change)"
         ]
       },
@@ -238,6 +293,17 @@
         "unmounts": 0,
         "notes": [
           "Imported via deep paths (react-virtualized/dist/commonjs/List, .../AutoSizer) rather than the package barrel -- avoids a confirmed esbuild/Rollup packaging bug in the barrel export (see source comment). Empirically independent of React version: same failure under React 17."
+        ]
+      },
+      "react-slick": {
+        "name": "react-slick",
+        "status": "ok",
+        "mounts": 1,
+        "unmounts": 0,
+        "notes": [
+          "ok active slick dot ::before color (custom CSS beating slick-theme.css default)",
+          "ok inactive slick dot ::before color (custom CSS beating slick-theme.css default)",
+          "JSS-styled slide background (expect rgb(238, 238, 255)): rgb(238, 238, 255)"
         ]
       }
     },

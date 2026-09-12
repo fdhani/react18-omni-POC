@@ -244,15 +244,71 @@ internal timing) — recorded as an observed, deterministic curiosity, not a
 finding either direction. If anything, it says legacy-root creates *more*
 incidental JSS activity than `createRoot`, not less.
 
+## Closing the API-usage gap: matched against the real theme.ts/material.d.ts
+
+After the section above, the real app's actual theme structure and
+`material.d.ts` module-augmentation targets were described directly (not the
+files themselves — this session still has no access to the real repo). That
+description named several theme keys, override targets, and styling APIs
+the smoke test hadn't touched at all. Closed every one of them:
+
+| Item | Real app's usage | Tested here |
+|---|---|---|
+| Custom top-level `shadow` key | `main`/`button`/`box`/`hover`, requires augmenting `Theme`/`ThemeOptions` themselves | ✅ added, augmented `@material-ui/core/styles`, read back via `useTheme()` |
+| `shape.borderRadius` | present in `theme.ts` | ✅ added, read back via `useTheme()` |
+| Richer custom palette types | `icon`, `calendarBackground`, `filter`, `inputBackground`, extended `background` | ✅ added `IconOption`/`CalendarPaletteOption`/`Filter` types + extended `TypeBackground`, all consumed and verified via computed style |
+| `MuiDivider` override | in `overrides` | ✅ |
+| Stepper sub-component set | `MuiStepConnector`, `MuiStepIcon` (custom component), `MuiStepLabel` | ✅ `MuiStepConnector`/`MuiStepLabel` overrides + a real custom `StepIcon` component (swaps icon/color by active/completed/default state) |
+| `props: { MuiAlert, MuiModal, MuiTooltip }` | `theme.ts` | ✅ set on the exact three components (not the arbitrary pair tested earlier), plus a `ComponentsPropsList` augmentation for `MuiAlert` (a Lab component) |
+| `ComponentsPropsList` augmentation | `material.d.ts` | ✅ |
+| `GlobalStyles.tsx` | `src/view/theme/` | ✅ approximated with `withStyles({'@global': {...}})`, the standard v4 pattern for exactly this |
+| Plain CSS coexisting with JSS (`ReactSlickStyles.css`) | `src/view/theme/` | ✅ installed `react-slick` + `slick-carousel`, added a custom override `.css` file layered on the library's own CSS plus a JSS-styled sibling element, verified cascade order survives intact |
+| `useTheme` (37 files) | — | ✅ |
+| `createStyles` (11 files) | — | ✅ |
+| `styled` (8 files) | — | ✅ |
+| `withStyles` (2 files) | — | ✅ (via the custom `StepIcon` and `GlobalStyles`) |
+
+**Result: everything above works correctly under React 18, verified by
+computed style (not appearance), in all three cells** — legacy root,
+`createRoot`, and `createRoot`+StrictMode alike. Zero console errors or
+warnings in production throughout.
+
+Three checks initially failed; all three were bugs in the test, not in MUI
+or React 18, and are worth recording precisely because each is exactly the
+"a component/props change can silently invalidate a class-key override"
+risk this investigation keeps naming — just self-inflicted this time,
+by my own changes, rather than a v4→v5 migration:
+
+- Adding `props.MuiAlert.variant = 'filled'` silently switched Alert's
+  rendered class from `standardSuccess` to `filledSuccess` — the override
+  written against the old default stopped applying. Fixed by targeting the
+  class the new default variant actually renders (confirmed by inspecting
+  the rendered class list, not assumed).
+- Narrowing `theme.props` down to the real app's exact three components
+  (removing an arbitrary `MuiTextField: { variant: 'outlined' }` tested
+  earlier) silently reverted the Autocomplete demo's `TextField` to the
+  default underline variant, so the override's target class
+  (`.MuiOutlinedInput-root`) stopped existing at all. Fixed by setting
+  `variant="outlined"` explicitly at the call site instead of relying on a
+  theme default.
+- `MuiStepLabel`'s `label` override applies correctly on the *default*
+  step state, but MUI's own `active`/`completed` state classes also set
+  `color` and win the cascade for those two states specifically — overriding
+  the base class key isn't enough when a state-specific key touches the
+  same property. Fixed by also setting `active`/`completed` in the override.
+
+Not tested: `MuiThemeProvider`/`StylesProvider`/`CssBaseline` — correctly
+skipped, since the real app doesn't use any of them either (0 files).
+
 ## Bundle size
 
-Adding this whole stack more than tripled the built JS: 256 KB → 765 KB
-(gzip: 78 KB → 231 KB, after switching the picker adapter from Moment to
-Luxon — Luxon is somewhat smaller). Expected given `@material-ui/core` +
-`lab` + `pickers` are all sizeable, and irrelevant to the React 18 question,
-but worth knowing if this stack is heading to production as-is — MUI v4 in
-particular is commonly trimmed in real migrations (tree-shaken icon imports,
-MUI v5).
+Adding this whole stack (now including `react-slick`/`slick-carousel` and
+the expanded theme) grew the built JS to 824 KB (gzip ~252 KB) plus a 16 KB
+stylesheet (slick's own CSS + the custom override file). Expected given
+`@material-ui/core` + `lab` + `pickers` + a carousel library are all
+sizeable, and irrelevant to the React 18 question, but worth knowing if this
+stack is heading to production as-is — MUI v4 in particular is commonly
+trimmed in real migrations (tree-shaken icon imports, MUI v5).
 
 ## Confidence
 
@@ -260,25 +316,37 @@ MUI v5).
 across both root APIs and both build modes — this was a direct, repeatable
 render-and-inspect test, not an inference.
 
-**High** that a *representative* customized MUI v4 theme (custom palette,
-breakpoints, shadows, typography, `defaultProps`, and JSS `overrides` for the
-8 components the dependency-upgrade investigation names) survives React 18
+**High** that a *representative* customized MUI v4 theme survives React 18
 intact — verified via computed style, in all three cells, including one full
 click-driven re-render through JSS's dynamic composition path, not just
-static mount.
+static mount. This now matches the real theme.ts/material.d.ts's actual
+described shape directly (custom top-level `shadow` key with its own
+`Theme`/`ThemeOptions` augmentation, `shape`, the richer custom palette
+types, `props` on the exact three components used, the full Stepper
+sub-component set including a custom `StepIcon`, global JSS styles, and a
+plain-CSS-plus-JSS coexistence test) rather than an approximation of it —
+every named theme key, override target, and styling API (`useTheme`,
+`createStyles`, `styled`, `withStyles`) has now been exercised at least once.
 
 **Moderate** on the redux tearing result specifically — a negative result on
 a race condition is only as strong as the workload used to look for it. If
 this stack is going to production carrying real traffic patterns, I'd treat
 "no tearing observed here" as encouraging, not conclusive.
 
-**Not tested — the largest remaining gap**: the *real* theme. This session
-has no access to the actual Omni Frontend repo, so the theme tested here is
-representative of the shape the investigation describes, not the real
-customizations, global `.Mui*` selectors, or the ~145 shared atoms/molecules
-it names as coupled to MUI. A representative theme surviving React 18 is
-meaningfully more evidence than the initial default-styled smoke test, but it
-is still not the same claim as "the production theme survives."
+**Not tested — the remaining gap**: the *real* theme's actual values,
+selectors, and the ~145 shared atoms/molecules it names as coupled to MUI.
+This session has no access to the actual Omni Frontend repo — every key,
+override target, and augmentation now matches what was *described*, built
+from scratch with placeholder values, not copied from the real
+`theme.ts`/`material.d.ts`. It also doesn't cover global `.Mui*` selectors
+targeting component internals from outside the theme (a distinct mechanism
+from the JSS `overrides`/`props` machinery tested here), or any interaction
+between the real theme's actual values and the app's real component tree.
+A representative theme with the right *shape* surviving React 18 is
+meaningfully more evidence than either the initial default-styled smoke test
+or an inference from reading the investigation doc — but it is still not
+the same claim as "the production theme survives," and closing that gap
+fully requires the real files.
 
 **Not tested**: user interaction with each widget beyond initial mount and the
 one JSS-composition click (typing into the date pickers, opening every menu/

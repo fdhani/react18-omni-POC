@@ -1,11 +1,11 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { createRoot } from 'react-dom/client';
-import App, { CELL } from './App';
+import App from './App';
 import LibSmokeTest from './libtests/LibSmokeTest';
 import { probe } from './probe';
+import { CELL, LIBS } from './params';
 
-const LIBS = new URLSearchParams(location.search).get('libs') === '1';
 const Root = LIBS ? LibSmokeTest : App;
 
 const container = document.getElementById('root')!;

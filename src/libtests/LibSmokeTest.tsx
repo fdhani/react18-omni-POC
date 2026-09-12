@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { CellSwitcher, ViewSwitcher } from '../Nav';
 import { ErrorBoundary } from './ErrorBoundary';
 import MuiCoreDemo from './MuiCoreDemo';
 import MuiLabDemo from './MuiLabDemo';
@@ -27,9 +28,17 @@ const SECTIONS: Array<[string, React.ComponentType]> = [
 export default function LibSmokeTest() {
   return (
     <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 20 }}>
-      <h1 style={{ font: '600 15px/1.4 system-ui, sans-serif' }}>
-        Dependency-stack smoke test — <span data-mode>{(window as any).__MODE__}</span>
-      </h1>
+      <header>
+        <h1 style={{ font: '600 15px/1.4 system-ui, sans-serif', margin: '0 0 8px' }}>
+          Dependency-stack smoke test — <span data-mode>{(window as any).__MODE__}</span>
+        </h1>
+        <ViewSwitcher />
+        <CellSwitcher />
+        <div style={{ font: '12px/1.5 system-ui, sans-serif', color: '#666' }}>
+          Per-section results on <code>window.__libResults</code> — inspect it{' '}
+          in the console.
+        </div>
+      </header>
       {SECTIONS.map(([name, Demo]) => (
         <section key={name}>
           <h2 style={{ font: '600 13px/1.4 system-ui, sans-serif', color: '#555' }}>{name}</h2>

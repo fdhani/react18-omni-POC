@@ -1,24 +1,15 @@
 import * as React from 'react';
 import StackGrid from 'react-stack-grid';
 import { probe } from './probe';
+import { CELL, PATH_B, DURATION, N_CARDS, linkWith } from './params';
+import { CellSwitcher, ViewSwitcher, rowStyle } from './Nav';
 
 const BASE_HEIGHTS = [150, 320, 210, 400, 180, 260];
 const GROW_INDEX = 2;
 const GROW_BY = 120;
 const RESOLVE_AFTER_MS = 800;
 
-const params = new URLSearchParams(location.search);
-export const CELL = params.get('cell') ?? '3';
-export const PATH_B = params.get('pathB') !== '0';
-export const DURATION = Number(params.get('duration') ?? '0');
-// Number of cards. A larger grid makes React's render work non-trivial, which is
-// where a concurrent root could plausibly yield and extend any tear.
-export const N_CARDS = Number(params.get('cards') ?? '6');
-
-const HEIGHTS: number[] = Array.from(
-  { length: Number(new URLSearchParams(location.search).get('cards') ?? '6') },
-  (_, i) => BASE_HEIGHTS[i % BASE_HEIGHTS.length],
-);
+const HEIGHTS: number[] = Array.from({ length: N_CARDS }, (_, i) => BASE_HEIGHTS[i % BASE_HEIGHTS.length]);
 
 type CardProps = {
   n: number;
@@ -99,30 +90,12 @@ function AsyncCard({ n, height, onLayout }: { n: number; height: number; onLayou
   );
 }
 
-const CELLS: Array<[string, string]> = [
-  ['2', 'ReactDOM.render (control)'],
-  ['3', 'createRoot'],
-  ['4', 'createRoot + StrictMode'],
-];
-
 /**
- * In-page matrix switcher. The repro is a single Vite app served at the root, so
- * this replaces what used to be a separate generated landing page.
+ * Page header: view switcher (this page vs. the dependency-stack smoke test),
+ * the root-API/StrictMode cell switcher, and this page's own trigger/duration
+ * controls.
  */
 function Nav() {
-  const link = (params: Record<string, string>) => {
-    const q = new URLSearchParams(location.search);
-    for (const [k, v] of Object.entries(params)) q.set(k, v);
-    return `?${q.toString()}`;
-  };
-  const box: React.CSSProperties = {
-    font: '13px/1.5 system-ui, sans-serif',
-    display: 'flex',
-    gap: 8,
-    flexWrap: 'wrap',
-    alignItems: 'baseline',
-    marginBottom: 6,
-  };
   const on: React.CSSProperties = { fontWeight: 700, textDecoration: 'none', color: '#111' };
   const off: React.CSSProperties = { color: '#0645ad' };
   return (
@@ -131,21 +104,15 @@ function Nav() {
         react-stack-grid 0.7.1 — cell <b data-cell>{CELL}</b> —{' '}
         <span data-mode>{(window as any).__MODE__}</span>
       </h1>
-      <div style={box}>
-        <span style={{ color: '#666' }}>cell:</span>
-        {CELLS.map(([c, label]) => (
-          <a key={c} href={link({ cell: c })} style={CELL === c ? on : off}>
-            {c} — {label}
-          </a>
-        ))}
-      </div>
-      <div style={box}>
+      <ViewSwitcher />
+      <CellSwitcher />
+      <div style={rowStyle}>
         <span style={{ color: '#666' }}>trigger:</span>
-        <a href={link({ pathB: '0' })} style={PATH_B ? off : on}>Path A (resize)</a>
-        <a href={link({ pathB: '1' })} style={PATH_B ? on : off}>Path B (async grow)</a>
+        <a href={linkWith({ pathB: '0' })} style={PATH_B ? off : on}>Path A (resize)</a>
+        <a href={linkWith({ pathB: '1' })} style={PATH_B ? on : off}>Path B (async grow)</a>
         <span style={{ color: '#666', marginLeft: 8 }}>duration:</span>
-        <a href={link({ duration: '0' })} style={DURATION === 0 ? on : off}>0</a>
-        <a href={link({ duration: '480' })} style={DURATION === 480 ? on : off}>480 (library default)</a>
+        <a href={linkWith({ duration: '0' })} style={DURATION === 0 ? on : off}>0</a>
+        <a href={linkWith({ duration: '480' })} style={DURATION === 480 ? on : off}>480 (library default)</a>
       </div>
       <div style={{ font: '12px/1.5 system-ui, sans-serif', color: '#666' }}>
         Per-frame probe on <code>window.__probe</code> — run{' '}

@@ -1,0 +1,191 @@
+{
+  "2": {
+    "cell": "2",
+    "mode": "react18 + ReactDOM.render (legacy root)",
+    "reactVersion": "18.3.1",
+    "results": {
+      "mui-core": {
+        "name": "mui-core",
+        "status": "ok",
+        "mounts": 1,
+        "unmounts": 0,
+        "notes": []
+      },
+      "mui-lab": {
+        "name": "mui-lab",
+        "status": "ok",
+        "mounts": 1,
+        "unmounts": 0,
+        "notes": []
+      },
+      "mui-pickers": {
+        "name": "mui-pickers",
+        "status": "ok",
+        "mounts": 1,
+        "unmounts": 0,
+        "notes": []
+      },
+      "redux": {
+        "name": "redux",
+        "status": "ok",
+        "mounts": 1,
+        "unmounts": 0,
+        "notes": [
+          "frames observed: 151",
+          "torn frames (readers disagreed): 0",
+          "final counter value: 401"
+        ]
+      },
+      "react-hook-form": {
+        "name": "react-hook-form",
+        "status": "ok",
+        "mounts": 1,
+        "unmounts": 0,
+        "notes": [
+          "registered fields (formState.errors keys type ok): true"
+        ]
+      },
+      "react-virtualized": {
+        "name": "react-virtualized",
+        "status": "ok",
+        "mounts": 1,
+        "unmounts": 0,
+        "notes": [
+          "react-virtualized/WindowScroller excluded from this demo: its dist/es build re-exports a Flow prop-type placeholder (bpfrpt_proptype_WindowScroller) that does not exist in the compiled output, which esbuild rejects outright -- `vite dev` and `vite build` both fail to even start with WindowScroller imported. Confirmed by a separate standalone build attempt, independent of React version."
+        ]
+      }
+    },
+    "consoleErrorCount": 0,
+    "consoleWarningCount": 0,
+    "pageErrors": [],
+    "consoleErrors": [],
+    "consoleWarnings": [],
+    "bodyTextSample": "Dependency-stack smoke test — react18 + ReactDOM.render (legacy root)\nmui-core\nOPEN DIALOG\nOPEN MENU\nSHOW SNACKBAR\nText field\nA\nOPEN DRAWER\nmui-lab\nAutocomplete\n1\n2\n3\n4\n5\n1 Star\n2 Stars\n3 Stars\n4 Star"
+  },
+  "3": {
+    "cell": "3",
+    "mode": "react18 + createRoot",
+    "reactVersion": "18.3.1",
+    "results": {
+      "mui-core": {
+        "name": "mui-core",
+        "status": "ok",
+        "mounts": 1,
+        "unmounts": 0,
+        "notes": []
+      },
+      "mui-lab": {
+        "name": "mui-lab",
+        "status": "ok",
+        "mounts": 1,
+        "unmounts": 0,
+        "notes": []
+      },
+      "mui-pickers": {
+        "name": "mui-pickers",
+        "status": "ok",
+        "mounts": 1,
+        "unmounts": 0,
+        "notes": []
+      },
+      "redux": {
+        "name": "redux",
+        "status": "ok",
+        "mounts": 1,
+        "unmounts": 0,
+        "notes": [
+          "frames observed: 152",
+          "torn frames (readers disagreed): 0",
+          "final counter value: 401"
+        ]
+      },
+      "react-hook-form": {
+        "name": "react-hook-form",
+        "status": "ok",
+        "mounts": 1,
+        "unmounts": 0,
+        "notes": [
+          "registered fields (formState.errors keys type ok): true"
+        ]
+      },
+      "react-virtualized": {
+        "name": "react-virtualized",
+        "status": "ok",
+        "mounts": 1,
+        "unmounts": 0,
+        "notes": [
+          "react-virtualized/WindowScroller excluded from this demo: its dist/es build re-exports a Flow prop-type placeholder (bpfrpt_proptype_WindowScroller) that does not exist in the compiled output, which esbuild rejects outright -- `vite dev` and `vite build` both fail to even start with WindowScroller imported. Confirmed by a separate standalone build attempt, independent of React version."
+        ]
+      }
+    },
+    "consoleErrorCount": 0,
+    "consoleWarningCount": 0,
+    "pageErrors": [],
+    "consoleErrors": [],
+    "consoleWarnings": [],
+    "bodyTextSample": "Dependency-stack smoke test — react18 + createRoot\nmui-core\nOPEN DIALOG\nOPEN MENU\nSHOW SNACKBAR\nText field\nA\nOPEN DRAWER\nmui-lab\nAutocomplete\n1\n2\n3\n4\n5\n1 Star\n2 Stars\n3 Stars\n4 Stars\n5 Stars\nmui-picke"
+  },
+  "4": {
+    "cell": "4",
+    "mode": "react18 + createRoot + StrictMode",
+    "reactVersion": "18.3.1",
+    "results": {
+      "mui-core": {
+        "name": "mui-core",
+        "status": "ok",
+        "mounts": 1,
+        "unmounts": 0,
+        "notes": []
+      },
+      "mui-lab": {
+        "name": "mui-lab",
+        "status": "ok",
+        "mounts": 1,
+        "unmounts": 0,
+        "notes": []
+      },
+      "mui-pickers": {
+        "name": "mui-pickers",
+        "status": "ok",
+        "mounts": 1,
+        "unmounts": 0,
+        "notes": []
+      },
+      "redux": {
+        "name": "redux",
+        "status": "ok",
+        "mounts": 1,
+        "unmounts": 0,
+        "notes": [
+          "frames observed: 152",
+          "torn frames (readers disagreed): 0",
+          "final counter value: 401"
+        ]
+      },
+      "react-hook-form": {
+        "name": "react-hook-form",
+        "status": "ok",
+        "mounts": 1,
+        "unmounts": 0,
+        "notes": [
+          "registered fields (formState.errors keys type ok): true"
+        ]
+      },
+      "react-virtualized": {
+        "name": "react-virtualized",
+        "status": "ok",
+        "mounts": 1,
+        "unmounts": 0,
+        "notes": [
+          "react-virtualized/WindowScroller excluded from this demo: its dist/es build re-exports a Flow prop-type placeholder (bpfrpt_proptype_WindowScroller) that does not exist in the compiled output, which esbuild rejects outright -- `vite dev` and `vite build` both fail to even start with WindowScroller imported. Confirmed by a separate standalone build attempt, independent of React version."
+        ]
+      }
+    },
+    "consoleErrorCount": 0,
+    "consoleWarningCount": 0,
+    "pageErrors": [],
+    "consoleErrors": [],
+    "consoleWarnings": [],
+    "bodyTextSample": "Dependency-stack smoke test — react18 + createRoot + StrictMode\nmui-core\nOPEN DIALOG\nOPEN MENU\nSHOW SNACKBAR\nText field\nA\nOPEN DRAWER\nmui-lab\nAutocomplete\n1\n2\n3\n4\n5\n1 Star\n2 Stars\n3 Stars\n4 Stars\n5 St"
+  }
+}

@@ -2,7 +2,11 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { createRoot } from 'react-dom/client';
 import App, { CELL } from './App';
+import LibSmokeTest from './libtests/LibSmokeTest';
 import { probe } from './probe';
+
+const LIBS = new URLSearchParams(location.search).get('libs') === '1';
+const Root = LIBS ? LibSmokeTest : App;
 
 const container = document.getElementById('root')!;
 
@@ -21,16 +25,18 @@ const MODE =
 (window as any).__probe = probe;
 probe.cell = CELL;
 probe.mode = MODE;
+// The lib smoke test doesn't use the stack-grid probe, but starting it is
+// harmless (it just finds no `.the-grid` element and records nothing useful).
 probe.start();
 
 if (CELL === '2') {
-  (ReactDOM as any).render(<App />, container);
+  (ReactDOM as any).render(<Root />, container);
 } else if (CELL === '4') {
   createRoot(container).render(
     <React.StrictMode>
-      <App />
+      <Root />
     </React.StrictMode>,
   );
 } else {
-  createRoot(container).render(<App />);
+  createRoot(container).render(<Root />);
 }

@@ -15,9 +15,9 @@ for (let i=0;i<40;i++){try{if((await fetch('http://localhost:4600/')).ok)break;}
 
 const browser = await chromium.launch();
 const urls = [
-  ['2', 'http://localhost:4600/r18/index.html?cell=2&pathB=1'],
-  ['3', 'http://localhost:4600/r18/index.html?cell=3&pathB=1'],
-  ['4', 'http://localhost:4600/r18/index.html?cell=4&pathB=1'],
+  ['2', 'http://localhost:4600/?cell=2&pathB=1'],
+  ['3', 'http://localhost:4600/?cell=3&pathB=1'],
+  ['4', 'http://localhost:4600/?cell=4&pathB=1'],
 ];
 const page = await browser.newPage({ viewport: { width: 1000, height: 900 } });
 const errs = [];
@@ -32,9 +32,9 @@ for (const [cell, url] of urls) {
   }));
   console.log(`cell ${cell}: react=${i.react} cards=${i.cards} gridHeight=${i.h}  mode="${i.mode}"`);
 }
-// Landing page links
+// The in-page matrix switcher replaces the old generated landing page.
 await page.goto('http://localhost:4600/');
 const links = await page.$$eval('a', as => as.map(a => a.getAttribute('href')));
-console.log('landing links:', links.length);
+console.log('nav links:', links.length);
 console.log('pageerrors:', errs.length ? errs : 'none');
 await browser.close(); try { process.kill(-srv.pid, 'SIGKILL'); } catch {} process.exit(0);

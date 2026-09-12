@@ -14,7 +14,6 @@ import path from 'node:path';
  */
 const [, , cellArg] = process.argv;
 const cell = cellArg ?? '3';
-const app = 'app18';
 const port = 4518;
 const OUT = path.resolve(import.meta.dirname, '..', 'results');
 const root = path.resolve(import.meta.dirname, '..');
@@ -30,8 +29,8 @@ async function portFree(p) {
 for (let i = 0; i < 60 && !(await portFree(port)); i++) await new Promise((r) => setTimeout(r, 500));
 
 const srv = spawn(process.execPath,
-  [path.join(root, app, 'node_modules', 'vite', 'bin', 'vite.js'), 'preview', '--port', String(port), '--strictPort'],
-  { cwd: path.join(root, app), stdio: ['ignore', 'ignore', 'inherit'], detached: true });
+  [path.join(root, 'node_modules', 'vite', 'bin', 'vite.js'), 'preview', '--port', String(port), '--strictPort'],
+  { cwd: root, stdio: ['ignore', 'ignore', 'inherit'], detached: true });
 const shutdown = () => { try { process.kill(-srv.pid, 'SIGKILL'); } catch {} };
 process.on('exit', shutdown);
 for (let i = 0; i < 60; i++) { try { if ((await fetch(`http://localhost:${port}/`)).ok) break; } catch {} await new Promise((r) => setTimeout(r, 500)); }

@@ -4,7 +4,7 @@
     "trigger": "A",
     "react": "18.3.1",
     "mode": "react18 + ReactDOM.render (legacy root)",
-    "frames": 319,
+    "frames": 317,
     "widthChanges": 17,
     "lagFramesMedian": 0,
     "lagFramesMax": 2,
@@ -25,7 +25,7 @@
     "trigger": "B",
     "react": "18.3.1",
     "mode": "react18 + ReactDOM.render (legacy root)",
-    "frames": 151,
+    "frames": 152,
     "widthChanges": 0,
     "lagFramesMedian": 0,
     "lagFramesMax": 0,
@@ -35,7 +35,7 @@
     "jumpPxMax": 0,
     "lagHistogram": {},
     "tornFramesWidth": 0,
-    "overlapFrames": 27,
+    "overlapFrames": 28,
     "consoleCount": 0
   },
   {
@@ -48,7 +48,7 @@
     "lagFramesMedian": 0,
     "lagFramesMax": 3,
     "lagMsMedian": 0,
-    "lagMsMax": 43,
+    "lagMsMax": 52,
     "jumpPxMedian": 0,
     "jumpPxMax": 3,
     "lagHistogram": {
@@ -56,7 +56,7 @@
       "3": 1
     },
     "tornFramesWidth": 1,
-    "overlapFrames": 34,
+    "overlapFrames": 35,
     "consoleCount": 0
   },
   {
@@ -82,7 +82,7 @@
     "trigger": "A",
     "react": "18.3.1",
     "mode": "react18 + createRoot + StrictMode",
-    "frames": 315,
+    "frames": 316,
     "widthChanges": 17,
     "lagFramesMedian": 0,
     "lagFramesMax": 3,
@@ -95,7 +95,7 @@
       "3": 1
     },
     "tornFramesWidth": 1,
-    "overlapFrames": 34,
+    "overlapFrames": 35,
     "consoleCount": 0
   },
   {

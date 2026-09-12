@@ -99,6 +99,62 @@ function AsyncCard({ n, height, onLayout }: { n: number; height: number; onLayou
   );
 }
 
+const CELLS: Array<[string, string]> = [
+  ['2', 'ReactDOM.render (control)'],
+  ['3', 'createRoot'],
+  ['4', 'createRoot + StrictMode'],
+];
+
+/**
+ * In-page matrix switcher. The repro is a single Vite app served at the root, so
+ * this replaces what used to be a separate generated landing page.
+ */
+function Nav() {
+  const link = (params: Record<string, string>) => {
+    const q = new URLSearchParams(location.search);
+    for (const [k, v] of Object.entries(params)) q.set(k, v);
+    return `?${q.toString()}`;
+  };
+  const box: React.CSSProperties = {
+    font: '13px/1.5 system-ui, sans-serif',
+    display: 'flex',
+    gap: 8,
+    flexWrap: 'wrap',
+    alignItems: 'baseline',
+    marginBottom: 6,
+  };
+  const on: React.CSSProperties = { fontWeight: 700, textDecoration: 'none', color: '#111' };
+  const off: React.CSSProperties = { color: '#0645ad' };
+  return (
+    <header style={{ marginBottom: 12 }}>
+      <h1 style={{ font: '600 15px/1.4 system-ui, sans-serif', margin: '0 0 8px' }}>
+        react-stack-grid 0.7.1 — cell <b data-cell>{CELL}</b> —{' '}
+        <span data-mode>{(window as any).__MODE__}</span>
+      </h1>
+      <div style={box}>
+        <span style={{ color: '#666' }}>cell:</span>
+        {CELLS.map(([c, label]) => (
+          <a key={c} href={link({ cell: c })} style={CELL === c ? on : off}>
+            {c} — {label}
+          </a>
+        ))}
+      </div>
+      <div style={box}>
+        <span style={{ color: '#666' }}>trigger:</span>
+        <a href={link({ pathB: '0' })} style={PATH_B ? off : on}>Path A (resize)</a>
+        <a href={link({ pathB: '1' })} style={PATH_B ? on : off}>Path B (async grow)</a>
+        <span style={{ color: '#666', marginLeft: 8 }}>duration:</span>
+        <a href={link({ duration: '0' })} style={DURATION === 0 ? on : off}>0</a>
+        <a href={link({ duration: '480' })} style={DURATION === 480 ? on : off}>480 (library default)</a>
+      </div>
+      <div style={{ font: '12px/1.5 system-ui, sans-serif', color: '#666' }}>
+        Per-frame probe on <code>window.__probe</code> — run{' '}
+        <code>__probe.result()</code> in the console.
+      </div>
+    </header>
+  );
+}
+
 export default function App() {
   const gridRef = React.useRef<any>(null);
 
@@ -108,10 +164,7 @@ export default function App() {
 
   return (
     <div style={{ padding: 16 }}>
-      <h1 style={{ font: '600 15px/1.4 system-ui, sans-serif', margin: '0 0 12px' }}>
-        react-stack-grid 0.7.1 — cell <b data-cell>{CELL}</b> — <span data-mode>{(window as any).__MODE__}</span>
-        {PATH_B ? '' : ' — Path A only'}
-      </h1>
+      <Nav />
       <div style={{ maxWidth: 994, margin: '0 auto' }}>
         <StackGrid
           gridRef={(g: any) => {

@@ -1,0 +1,45 @@
+### RUN prod 0 6
+cell 1 path A  react=17.0.2  frames=318  wChanges=17 tornW=17  hChanges=1 tornH=0  overlap=7 overflow=0  console=0
+cell 1 path B  react=17.0.2  frames=151  wChanges=0 tornW=0  hChanges=2 tornH=1  overlap=2 overflow=0  console=0
+cell 2 path A  react=18.3.1  frames=318  wChanges=17 tornW=17  hChanges=1 tornH=0  overlap=7 overflow=0  console=0
+cell 2 path B  react=18.3.1  frames=152  wChanges=0 tornW=0  hChanges=2 tornH=1  overlap=2 overflow=0  console=0
+cell 3 path A  react=18.3.1  frames=316  wChanges=17 tornW=17  hChanges=1 tornH=0  overlap=7 overflow=0  console=0
+cell 3 path B  react=18.3.1  frames=151  wChanges=0 tornW=0  hChanges=2 tornH=1  overlap=2 overflow=0  console=0
+cell 4 path A  react=18.3.1  frames=315  wChanges=17 tornW=17  hChanges=0 tornH=0  overlap=6 overflow=0  console=0
+cell 4 path B  react=18.3.1  frames=151  wChanges=0 tornW=0  hChanges=2 tornH=1  overlap=2 overflow=0  console=0
+wrote /home/user/react18-omni-POC/results/results-prod-duration0-cards6.json
+### EXIT 0
+### RUN prod 480 6
+cell 1 path A  react=17.0.2  frames=318  wChanges=17 tornW=1  hChanges=30 tornH=0  overlap=34 overflow=29  console=0
+cell 1 path B  react=17.0.2  frames=151  wChanges=0 tornW=0  hChanges=59 tornH=0  overlap=27 overflow=55  console=0
+cell 2 path A  react=18.3.1  frames=317  wChanges=17 tornW=1  hChanges=30 tornH=0  overlap=35 overflow=30  console=0
+cell 2 path B  react=18.3.1  frames=152  wChanges=0 tornW=0  hChanges=59 tornH=0  overlap=27 overflow=55  console=0
+cell 3 path A  react=18.3.1  frames=317  wChanges=17 tornW=1  hChanges=30 tornH=1  overlap=35 overflow=28  console=0
+cell 3 path B  react=18.3.1  frames=151  wChanges=0 tornW=0  hChanges=59 tornH=2  overlap=29 overflow=53  console=0
+cell 4 path A  react=18.3.1  frames=315  wChanges=17 tornW=1  hChanges=30 tornH=0  overlap=34 overflow=29  console=0
+cell 4 path B  react=18.3.1  frames=151  wChanges=0 tornW=0  hChanges=59 tornH=1  overlap=29 overflow=53  console=0
+wrote /home/user/react18-omni-POC/results/results-prod-duration480-cards6.json
+### EXIT 0
+### RUN prod 0 60
+cell 1 path A  react=17.0.2  frames=318  wChanges=17 tornW=17  hChanges=1 tornH=0  overlap=7 overflow=0  console=0
+cell 1 path B  react=17.0.2  frames=150  wChanges=0 tornW=0  hChanges=1 tornH=1  overlap=1 overflow=0  console=0
+cell 2 path A  react=18.3.1  frames=317  wChanges=17 tornW=17  hChanges=1 tornH=0  overlap=7 overflow=0  console=0
+cell 2 path B  react=18.3.1  frames=150  wChanges=0 tornW=0  hChanges=2 tornH=1  overlap=2 overflow=0  console=0
+cell 3 path A  react=18.3.1  frames=317  wChanges=17 tornW=17  hChanges=1 tornH=0  overlap=7 overflow=0  console=0
+cell 3 path B  react=18.3.1  frames=150  wChanges=0 tornW=0  hChanges=2 tornH=1  overlap=2 overflow=0  console=0
+cell 4 path A  react=18.3.1  frames=316  wChanges=17 tornW=17  hChanges=1 tornH=0  overlap=7 overflow=0  console=0
+cell 4 path B  react=18.3.1  frames=151  wChanges=0 tornW=0  hChanges=2 tornH=1  overlap=2 overflow=0  console=0
+wrote /home/user/react18-omni-POC/results/results-prod-duration0-cards60.json
+### EXIT 0
+### RUN dev 0 6
+cell 1 path A  react=17.0.2  frames=319  wChanges=17 tornW=17  hChanges=1 tornH=0  overlap=7 overflow=0  console=4
+cell 1 path B  react=17.0.2  frames=152  wChanges=0 tornW=0  hChanges=2 tornH=1  overlap=2 overflow=0  console=4
+cell 2 path A  react=18.3.1  frames=318  wChanges=17 tornW=17  hChanges=1 tornH=0  overlap=7 overflow=0  console=7
+cell 2 path B  react=18.3.1  frames=151  wChanges=0 tornW=0  hChanges=2 tornH=1  overlap=2 overflow=0  console=7
+cell 3 path A  react=18.3.1  frames=316  wChanges=17 tornW=17  hChanges=1 tornH=0  overlap=7 overflow=0  console=6
+cell 3 path B  react=18.3.1  frames=150  wChanges=0 tornW=0  hChanges=2 tornH=1  overlap=2 overflow=0  console=6
+cell 4 path A  react=18.3.1  frames=316  wChanges=17 tornW=17  hChanges=0 tornH=0  overlap=0 overflow=0  console=5
+cell 4 path B  react=18.3.1  frames=151  wChanges=0 tornW=0  hChanges=0 tornH=0  overlap=0 overflow=0  console=5
+wrote /home/user/react18-omni-POC/results/results-dev-duration0-cards6.json
+### EXIT 0
+ALLDONE

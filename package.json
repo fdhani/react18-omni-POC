@@ -1,0 +1,15 @@
+{
+  "name": "react18-stack-grid-repro",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Minimal React 18 repro testing whether react-stack-grid@0.7.1 tears under a concurrent root.",
+  "scripts": {
+    "install:all": "npm --prefix app18 install && npm --prefix harness install",
+    "dev": "npm --prefix app18 run dev",
+    "build": "node build-site.mjs",
+    "vercel-build": "npm --prefix app18 install --no-audit --no-fund && node build-site.mjs",
+    "measure": "node harness/run.mjs prod 0 6",
+    "analyze": "node harness/analyze.mjs results/results-prod-duration0-cards6.json && node harness/analyzeB.mjs results/results-prod-duration0-cards6.json"
+  }
+}

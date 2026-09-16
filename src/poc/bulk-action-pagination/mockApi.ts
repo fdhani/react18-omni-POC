@@ -187,43 +187,37 @@ export function countMatching(filters: Filters): number {
 // ------------------------------------------------ the payload, and its truth ---
 
 /**
- * The shape the frontend sends on submit. Mirrors the Notion tables:
- * `selectAll: true, filter: [A, B], exclude: [X1]`.
+ * The shape the frontend sends on submit, following the Notion tables:
+ * `selectAll: true, filter: [A], exclude: [X1]`.
+ *
+ * `filter` is singular on purpose. Under the Proposal there is only ever one
+ * select-all in force, so there is never a list of filters to union -- which is
+ * exactly what made the stacked version miscount.
  */
 export type SelectionPayload = {
   selectAll: boolean;
-  /** One entry per select-all the user performed. Stacking strategies push more than one. */
-  filters: Filters[];
-  /** Individually ticked employees, on top of whatever the filters cover. */
+  /** The filter the select-all captured, or null when nothing was selected wholesale. */
+  filter: Filters | null;
+  /** Individually ticked employees, on top of whatever the filter covers. */
   include: EmployeeId[];
-  /** Individually unticked employees, removed from whatever the filters cover. */
+  /** Individually unticked employees, removed from whatever the filter covers. */
   exclude: EmployeeId[];
 };
 
 /**
- * What the backend would really assign, given that payload. Union of every
- * select-all filter, plus explicit includes, minus explicit excludes.
+ * What the backend would really assign, given that payload: everyone matching
+ * the captured filter, plus explicit includes, minus explicit excludes.
  *
  * The frontend cannot compute this -- that is the entire problem -- so the
- * prototype only uses it to render the "actual" column beside the UI's guess.
+ * prototype uses it only to show, beside the count on screen, that the
+ * Proposal's arithmetic holds.
  */
 export function resolveSelection(payload: SelectionPayload): Set<EmployeeId> {
   const out = new Set<EmployeeId>();
-  if (payload.selectAll) {
-    for (const f of payload.filters) {
-      for (const e of EMPLOYEES) if (matches(e, f)) out.add(e.id);
-    }
+  if (payload.selectAll && payload.filter) {
+    for (const e of EMPLOYEES) if (matches(e, payload.filter)) out.add(e.id);
   }
   for (const id of payload.include) out.add(id);
   for (const id of payload.exclude) out.delete(id);
   return out;
-}
-
-/** Ground truth for one row: would the backend consider it selected? */
-export function isTrulySelected(payload: SelectionPayload, id: EmployeeId): boolean {
-  if (payload.exclude.includes(id)) return false;
-  if (payload.include.includes(id)) return true;
-  if (!payload.selectAll) return false;
-  const e = EMPLOYEES.find((x) => x.id === id);
-  return e ? payload.filters.some((f) => matches(e, f)) : false;
 }

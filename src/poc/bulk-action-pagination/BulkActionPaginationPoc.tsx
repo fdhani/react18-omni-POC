@@ -1,5 +1,26 @@
 import * as React from 'react';
-import './poc.css';
+import Alert from '@mui/material/Alert';
+import AlertTitle from '@mui/material/AlertTitle';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Container from '@mui/material/Container';
+import Divider from '@mui/material/Divider';
+import Link from '@mui/material/Link';
+import Paper from '@mui/material/Paper';
+import ScopedCssBaseline from '@mui/material/ScopedCssBaseline';
+import Snackbar from '@mui/material/Snackbar';
+import Stack from '@mui/material/Stack';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TablePagination from '@mui/material/TablePagination';
+import TableRow from '@mui/material/TableRow';
+import Typography from '@mui/material/Typography';
+import { ThemeProvider, alpha } from '@mui/material/styles';
+
+import { theme } from './theme';
 import {
   EMPTY_FILTERS,
   type Employee,
@@ -8,47 +29,36 @@ import {
   countMatching,
   describeFilters,
   fetchEmployees,
-  isTrulySelected,
   resolveSelection,
 } from './mockApi';
 import {
   EMPTY_SELECTION,
   type SelectionState,
-  STRATEGIES,
-  type StrategyId,
   buildPayload,
   pageCheckState,
   reduce,
   rowCheckState,
   scopeCoversCurrentFilter,
+  selectedCount,
   shouldOfferSelectAll,
-  strategyById,
-  uiCount,
 } from './selection';
 import { SCENARIOS, type LogRow, type Scenario } from './scenarios';
-import { EmployeeTable, FilterBar, Pagination, Toast, fmt, type RowView } from './components';
+import { EmployeeTable, FilterBar, fmt, type RowView } from './components';
 
 /**
  * Prototype for "Problem: Assign Employee with paginated select-all in Add
- * Entitlement" (Notion, Ad Hoc Time Off FE).
+ * Entitlement" (Notion, Ad Hoc Time Off FE), implementing the doc's Proposal:
+ * one select-all, captured against the filter on screen, replaced wholesale by
+ * the next one, with individual includes and excludes on top.
  *
- * It is the Add Entitlement step-2 employee picker: 10,000 employees behind a
- * paginated, combinably-filtered endpoint. Every option the doc weighs is
- * implemented behind one switch, over one dataset, so the same clicks can be
- * replayed under each and compared.
- *
- * The column the doc could only argue about is rendered here as fact: beside
- * the count the frontend shows sits the count the backend would actually
- * assign, because the mock backend can resolve the payload the frontend built.
- * Where those two numbers part company, the option is broken.
+ * The employee list is the Add Entitlement step-2 picker: 10,000 employees
+ * behind a paginated, combinably-filtered endpoint that only ever returns one
+ * page and a totalCount.
  */
 
 const DEFAULT_PAGE_SIZE = 25;
 
 export default function BulkActionPaginationPoc() {
-  const [strategyId, setStrategyId] = React.useState<StrategyId>('proposal');
-  const strategy = strategyById(strategyId);
-
   const [filters, setFilters] = React.useState<Filters>(EMPTY_FILTERS);
   const [page, setPage] = React.useState(1);
   const [pageSize, setPageSize] = React.useState(DEFAULT_PAGE_SIZE);
@@ -58,15 +68,12 @@ export default function BulkActionPaginationPoc() {
   const [totalCount, setTotalCount] = React.useState(TOTAL_EMPLOYEES);
   const [loading, setLoading] = React.useState(true);
 
-  const [reveal, setReveal] = React.useState(false);
   const [log, setLog] = React.useState<LogRow[]>([]);
   const [toast, setToast] = React.useState<string | null>(null);
   const [running, setRunning] = React.useState<string | null>(null);
 
   // --------------------------------------------------------------- fetching ---
 
-  // Only ever one page of rows plus a total. Everything downstream has to work
-  // from that, which is the whole problem.
   const requestId = React.useRef(0);
   React.useEffect(() => {
     const id = ++requestId.current;
@@ -82,110 +89,75 @@ export default function BulkActionPaginationPoc() {
 
   // ---------------------------------------------------------------- derived ---
 
-  const payload = React.useMemo(() => buildPayload(selection, EMPTY_FILTERS), [selection]);
-  const believedCount = uiCount(selection);
-  const actualCount = React.useMemo(() => resolveSelection(payload).size, [payload]);
-  const diverges = believedCount !== actualCount;
+  const payload = React.useMemo(() => buildPayload(selection), [selection]);
+  const count = selectedCount(selection);
+  const resolvedCount = React.useMemo(() => resolveSelection(payload).size, [payload]);
 
   const rowViews: RowView[] = React.useMemo(
-    () =>
-      rows.map((employee) => ({
-        employee,
-        state: rowCheckState(selection, employee.id, filters),
-        trulySelected: isTrulySelected(payload, employee.id),
-      })),
-    [rows, selection, filters, payload],
+    () => rows.map((employee) => ({ employee, state: rowCheckState(selection, employee.id, filters) })),
+    [rows, selection, filters],
   );
 
   const pageState = pageCheckState(rowViews.map((r) => r.state));
-  const pageCount = Math.max(1, Math.ceil(totalCount / pageSize));
-  const activeScope = selection.scopes[selection.scopes.length - 1];
+  const scope = selection.scope;
   const scopeIsCurrentFilter = scopeCoversCurrentFilter(selection, filters);
-  const offerSelectAll = shouldOfferSelectAll(selection, strategy, pageState, totalCount, pageSize, filters);
+  const offerSelectAll = shouldOfferSelectAll(selection, pageState, totalCount, pageSize);
   const busy = running !== null;
-
-  // ----------------------------------------------------------------- logging ---
-
-  /** Appends one row in the column layout the doc's simulation tables use. */
-  const appendLog = React.useCallback(
-    (action: string, atFilters: Filters, next: SelectionState) => {
-      const nextPayload = buildPayload(next, EMPTY_FILTERS);
-      setLog((prev) => [
-        ...prev,
-        {
-          n: prev.length + 1,
-          action,
-          beReturn: `page: 1 · totalCount: ${fmt(countMatching(atFilters))}`,
-          fePayload: formatPayload(nextPayload),
-          uiCount: uiCount(next),
-          actualCount: resolveSelection(nextPayload).size,
-        },
-      ]);
-    },
-    [],
-  );
 
   // ----------------------------------------------------------------- actions ---
 
-  const apply = React.useCallback(
-    (next: SelectionState, action: string, atFilters: Filters) => {
-      setSelection(next);
-      appendLog(action, atFilters, next);
-    },
-    [appendLog],
-  );
+  /** Appends one row in the column layout the doc's simulation tables use. */
+  const appendLog = React.useCallback((action: string, atFilters: Filters, next: SelectionState) => {
+    const nextPayload = buildPayload(next);
+    setLog((prev) => [
+      ...prev,
+      {
+        n: prev.length + 1,
+        action,
+        beReturn: `page: 1 · totalCount: ${fmt(countMatching(atFilters))}`,
+        fePayload: formatPayload(nextPayload),
+        uiCount: selectedCount(next),
+        actualCount: resolveSelection(nextPayload).size,
+      },
+    ]);
+  }, []);
+
+  const apply = (next: SelectionState, action: string, atFilters: Filters) => {
+    setSelection(next);
+    appendLog(action, atFilters, next);
+  };
 
   const changeFilters = (next: Filters) => {
-    const hadSelection = uiCount(selection) > 0;
-    const nextSelection = reduce(selection, { type: 'filters-changed' }, strategy);
     setFilters(next);
     setPage(1);
-    setSelection(nextSelection);
-    if (strategy.resetsOnFilterChange && hadSelection) {
-      setToast('Selection cleared due to filter change');
-    }
-    appendLog(`Filter — ${describeFilters(next)}`, next, nextSelection);
+    appendLog(`Filter — ${describeFilters(next)}`, next, selection);
   };
 
   const toggleRow = (id: string, checked: boolean) => {
-    const next = reduce(selection, { type: 'toggle-row', id, selected: checked, underFilters: filters }, strategy);
+    const next = reduce(selection, { type: 'toggle-row', id, selected: checked, underFilters: filters });
     apply(next, `${checked ? 'Include' : 'Exclude'} ${id}`, filters);
   };
 
   const togglePage = (checked: boolean) => {
     const ids = rows.map((r) => r.id);
-    const next = reduce(selection, { type: 'toggle-page', ids, selected: checked, underFilters: filters }, strategy);
+    const next = reduce(selection, { type: 'toggle-page', ids, selected: checked, underFilters: filters });
     apply(next, `${checked ? 'Select' : 'Deselect'} the ${ids.length} rows on this page`, filters);
   };
 
   const selectAllMatching = () => {
-    const next = reduce(selection, { type: 'select-all-matching', filters }, strategy);
+    const replacing = selection.scope !== null;
+    const next = reduce(selection, { type: 'select-all-matching', filters });
     apply(next, `Select all in "${describeFilters(filters)}" result`, filters);
+    if (replacing) setToast('Previous select-all cleared — selecting all in the current filter');
   };
 
-  const selectAllInSystem = () => {
-    const next = reduce(selection, { type: 'select-all-in-system' }, strategy);
-    apply(next, 'Select all employees in the system', filters);
-  };
-
-  const clearSelection = () => {
-    const next = reduce(selection, { type: 'clear' }, strategy);
-    apply(next, 'Clear selection', filters);
-  };
-
-  const changeStrategy = (id: StrategyId) => {
-    setStrategyId(id);
-    setSelection(EMPTY_SELECTION);
-    setLog([]);
-    setToast(null);
-  };
+  const clearSelection = () => apply(reduce(selection, { type: 'clear' }), 'Clear selection', filters);
 
   const resetAll = () => {
     setSelection(EMPTY_SELECTION);
     setFilters(EMPTY_FILTERS);
     setPage(1);
     setLog([]);
-    setToast(null);
   };
 
   // --------------------------------------------------------------- scenarios ---
@@ -199,7 +171,6 @@ export default function BulkActionPaginationPoc() {
     setRunning(scenario.id);
     setSelection(EMPTY_SELECTION);
     setLog([]);
-    setToast(null);
     setFilters(EMPTY_FILTERS);
     setPage(1);
 
@@ -209,21 +180,18 @@ export default function BulkActionPaginationPoc() {
 
     for (const step of scenario.steps) {
       switch (step.kind) {
-        case 'filter': {
+        case 'filter':
           current = step.filters;
           setFilters(current);
           setPage(1);
-          sel = reduce(sel, { type: 'filters-changed' }, strategy);
           break;
-        }
-        case 'select-all': {
-          sel = reduce(sel, { type: 'select-all-matching', filters: current }, strategy);
+        case 'select-all':
+          sel = reduce(sel, { type: 'select-all-matching', filters: current });
           break;
-        }
         case 'exclude-first-row': {
           const first = (await fetchEmployees(current, 1, pageSize)).employees[0];
           if (first) {
-            sel = reduce(sel, { type: 'toggle-row', id: first.id, selected: false, underFilters: current }, strategy);
+            sel = reduce(sel, { type: 'toggle-row', id: first.id, selected: false, underFilters: current });
           }
           break;
         }
@@ -238,274 +206,269 @@ export default function BulkActionPaginationPoc() {
   // -------------------------------------------------------------------- view ---
 
   return (
-    <main className="bap">
-      <header className="bap-head">
-        <p className="bap-eyebrow">Prototype · Ad Hoc Time Off FE</p>
-        <h1>Add New Entitlement — Step 2: Assign employees</h1>
-        <p className="bap-sub">
-          {fmt(TOTAL_EMPLOYEES)} employees behind a paginated, combinably-filtered endpoint. The
-          browser is handed one page of {pageSize} rows and a <code>totalCount</code> — never the
-          other {fmt(TOTAL_EMPLOYEES - pageSize)} — so &ldquo;select all&rdquo; has to be expressed
-          as intent rather than as a list of ids. Every option from{' '}
-          <em>Problem: Assign Employee with paginated select-all in Add Entitlement</em> is wired up
-          below, over the same dataset.
-        </p>
-      </header>
+    <ThemeProvider theme={theme}>
+      <ScopedCssBaseline sx={{ bgcolor: 'background.default', minHeight: '100vh' }}>
+        <Container maxWidth="lg" sx={{ py: 4 }}>
+          <Stack spacing={2.5}>
+            <Box>
+              <Typography variant="overline" color="text.secondary">
+                Prototype · Ad Hoc Time Off FE
+              </Typography>
+              <Typography variant="h5" fontWeight={700} gutterBottom>
+                Add New Entitlement — Step 2: Assign employees
+              </Typography>
+              <Typography color="text.secondary" sx={{ maxWidth: '84ch' }}>
+                {fmt(TOTAL_EMPLOYEES)} employees behind a paginated, combinably-filtered endpoint.
+                The browser is handed one page of {pageSize} rows and a <code>totalCount</code> —
+                never the other {fmt(TOTAL_EMPLOYEES - pageSize)} — so select-all is sent as intent
+                rather than as a list of ids. Select-all captures the filter on screen; clicking it
+                again clears that and captures the new filter, so select-alls never stack. Includes
+                and excludes sit on top.
+              </Typography>
+            </Box>
 
-      <section className="bap-panel" aria-label="Selection strategy">
-        <div className="bap-panel-title">Selection strategy</div>
-        <div className="bap-strategies">
-          {STRATEGIES.map((s) => (
-            <label key={s.id} className="bap-strategy" data-on={s.id === strategyId}>
-              <input
-                type="radio"
-                name="strategy"
-                value={s.id}
-                checked={s.id === strategyId}
+            <FilterBar filters={filters} onChange={changeFilters} disabled={busy} />
+
+            <Paper
+              variant="outlined"
+              data-testid="selection-summary"
+              sx={{
+                position: 'sticky',
+                top: 0,
+                zIndex: 5,
+                px: 2,
+                py: 1.25,
+                bgcolor: '#f4f6f8',
+              }}
+            >
+              <Stack direction="row" spacing={2} alignItems="center" useFlexGap flexWrap="wrap">
+                <Typography component="span">
+                  <Box component="span" sx={{ fontSize: 20, fontWeight: 700 }}>
+                    {fmt(count)}
+                  </Box>
+                  <Box component="span" sx={{ color: 'text.secondary' }}>
+                    {' '}
+                    / {fmt(TOTAL_EMPLOYEES)} selected
+                  </Box>
+                </Typography>
+                {scope ? (
+                  <Typography variant="body2" color="text.secondary">
+                    all of <b>{scope.label}</b> ({fmt(scope.total)})
+                    {selection.exclude.length ? ` − ${selection.exclude.length} excluded` : ''}
+                    {selection.include.length ? ` + ${selection.include.length} added` : ''}
+                  </Typography>
+                ) : null}
+                <Box sx={{ flex: 1 }} />
+                <Button size="small" onClick={clearSelection} disabled={busy || count === 0}>
+                  Clear selection
+                </Button>
+              </Stack>
+            </Paper>
+
+            {offerSelectAll ? (
+              <Alert severity="info" variant="outlined" sx={{ justifyContent: 'center' }}>
+                All {rows.length} employees on this page are selected.{' '}
+                <Link component="button" type="button" onClick={selectAllMatching} disabled={busy}>
+                  Select all {fmt(totalCount)} employees matching your filters
+                </Link>
+              </Alert>
+            ) : null}
+
+            {scope && scopeIsCurrentFilter ? (
+              <Alert severity="success" variant="outlined">
+                All {fmt(scope.total)} employees matching <b>{scope.label}</b> are selected
+                {selection.exclude.length ? `, minus ${selection.exclude.length} excluded individually` : ''}.
+              </Alert>
+            ) : null}
+
+            {scope && !scopeIsCurrentFilter ? (
+              <Alert severity="warning" variant="outlined">
+                <AlertTitle>Select-all is held against a different filter</AlertTitle>
+                It captured <b>{scope.label}</b>, which is not what is on screen. The frontend holds
+                that filter and its count, not the ids behind it, so it cannot say which of these
+                rows the selection covers — their checkboxes are marked unknown.{' '}
+                <Link component="button" type="button" onClick={selectAllMatching} disabled={busy}>
+                  Select all {fmt(totalCount)} matching this filter instead
+                </Link>{' '}
+                — which clears the current select-all, per the proposal.
+              </Alert>
+            ) : null}
+
+            <Box>
+              <EmployeeTable
+                rows={rowViews}
+                loading={loading}
+                pageState={pageState}
                 disabled={busy}
-                onChange={() => changeStrategy(s.id)}
+                onToggleRow={toggleRow}
+                onTogglePage={togglePage}
               />
-              <span>
-                <span className="bap-strategy-label">{s.label}</span>
-                <span className="bap-badge" data-verdict={s.verdict}>
-                  {s.verdict === 'accurate' ? 'count holds' : 'count drifts'}
-                </span>
-              </span>
-            </label>
-          ))}
-        </div>
-        <p className="bap-strategy-summary">{strategy.summary}</p>
-        <p className="bap-strategy-note">{strategy.note}</p>
-      </section>
+              <TablePagination
+                component="div"
+                count={totalCount}
+                page={page - 1}
+                rowsPerPage={pageSize}
+                rowsPerPageOptions={[10, 25, 50, 100]}
+                onPageChange={(_, p) => setPage(p + 1)}
+                onRowsPerPageChange={(e) => {
+                  setPageSize(Number(e.target.value));
+                  setPage(1);
+                }}
+                labelDisplayedRows={({ from, to, count: c }) => `${fmt(from)}–${fmt(to)} of ${fmt(c)}`}
+                slotProps={{ actions: { nextButton: { disabled: busy || page >= Math.ceil(totalCount / pageSize) }, previousButton: { disabled: busy || page <= 1 } } }}
+              />
+            </Box>
 
-      <FilterBar filters={filters} onChange={changeFilters} disabled={busy} />
+            <Paper variant="outlined" sx={{ p: 2 }}>
+              <Typography variant="overline" color="text.secondary" display="block" gutterBottom>
+                Payload the frontend would submit
+              </Typography>
+              <Box
+                component="pre"
+                sx={{
+                  m: 0,
+                  p: 1.5,
+                  borderRadius: 1,
+                  bgcolor: '#0b1220',
+                  color: '#d7e3ff',
+                  fontSize: 12,
+                  overflow: 'auto',
+                  maxHeight: 260,
+                }}
+              >
+                {JSON.stringify(payload, null, 2)}
+              </Box>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                The backend resolves this to {fmt(resolvedCount)} employee
+                {resolvedCount === 1 ? '' : 's'}: everyone matching the captured filter, plus{' '}
+                <code>include</code>, minus <code>exclude</code>. The UI shows {fmt(count)}
+                {count === resolvedCount ? ' — the same number.' : ` — off by ${fmt(Math.abs(count - resolvedCount))}.`}
+              </Typography>
+            </Paper>
 
-      <section className="bap-countbar" aria-live="polite">
-        <div>
-          <span className="bap-count">{fmt(believedCount)}</span>
-          <span className="bap-count-total"> / {fmt(TOTAL_EMPLOYEES)} selected</span>
-          <span className="bap-muted-sm"> — what the frontend believes</span>
-        </div>
-        <div className="bap-truthbox" data-diverges={diverges}>
-          <span className="bap-truthbox-label">Backend would assign</span>
-          <strong>{fmt(actualCount)}</strong>
-          <span className="bap-truthbox-verdict">
-            {diverges ? `✗ off by ${fmt(Math.abs(believedCount - actualCount))}` : '✓ matches'}
-          </span>
-        </div>
-        <label className="bap-reveal">
-          <input type="checkbox" checked={reveal} onChange={(e) => setReveal(e.target.checked)} />
-          Reveal backend truth per row
-        </label>
-        <button type="button" className="bap-btn" onClick={clearSelection} disabled={busy || believedCount === 0}>
-          Clear selection
-        </button>
-      </section>
+            <Paper variant="outlined" sx={{ p: 2 }}>
+              <Typography variant="overline" color="text.secondary" display="block">
+                Replay the doc’s simulations
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
+                The three walkthroughs from the doc’s Problem Simulation section, driven through the
+                controls above. Two of them are the sequences that miscounted when select-alls
+                stacked.
+              </Typography>
+              <Box
+                sx={{
+                  display: 'grid',
+                  gap: 1.5,
+                  gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' },
+                }}
+              >
+                {SCENARIOS.map((s) => (
+                  <Paper key={s.id} variant="outlined" sx={{ p: 1.5 }}>
+                    <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 0.5 }}>
+                      <Typography variant="caption" color="text.secondary">
+                        {s.docRef}
+                      </Typography>
+                      <Button
+                        size="small"
+                        variant="contained"
+                        disabled={busy}
+                        onClick={() => runScenario(s)}
+                      >
+                        {running === s.id ? 'Running…' : 'Run'}
+                      </Button>
+                    </Stack>
+                    <Typography variant="subtitle2">{s.title}</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {s.expectation}
+                    </Typography>
+                  </Paper>
+                ))}
+              </Box>
+            </Paper>
 
-      {strategy.id === 'global' ? (
-        <label className="bap-banner bap-banner-check">
-          <input
-            type="checkbox"
-            checked={selection.allInSystem}
-            disabled={busy}
-            onChange={(e) => (e.target.checked ? selectAllInSystem() : clearSelection())}
-          />
-          Select all {fmt(TOTAL_EMPLOYEES)} employees — filters only change what is displayed
-        </label>
-      ) : null}
+            <Paper variant="outlined" sx={{ p: 2 }}>
+              <Stack direction="row" spacing={1.5} alignItems="baseline" sx={{ mb: 1 }}>
+                <Typography variant="overline" color="text.secondary">
+                  Action log
+                </Typography>
+                {log.length ? (
+                  <Link component="button" type="button" variant="body2" onClick={() => setLog([])}>
+                    clear
+                  </Link>
+                ) : null}
+              </Stack>
+              {log.length === 0 ? (
+                <Typography variant="body2" color="text.secondary">
+                  Every action — filter, select-all, tick, untick — appends a row here, in the same
+                  columns the doc’s simulation tables use.
+                </Typography>
+              ) : (
+                <TableContainer>
+                  <Table size="small">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>#</TableCell>
+                        <TableCell>Action</TableCell>
+                        <TableCell>BE return</TableCell>
+                        <TableCell>FE payload</TableCell>
+                        <TableCell>Count in UI</TableCell>
+                        <TableCell>Actually assigned</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {log.map((r) => {
+                        const wrong = r.uiCount !== r.actualCount;
+                        return (
+                          <TableRow
+                            key={r.n}
+                            sx={wrong ? { bgcolor: (t) => alpha(t.palette.error.main, 0.08) } : undefined}
+                          >
+                            <TableCell sx={{ color: 'text.secondary' }}>{r.n}</TableCell>
+                            <TableCell>{r.action}</TableCell>
+                            <TableCell sx={MONO}>{r.beReturn}</TableCell>
+                            <TableCell sx={MONO}>{r.fePayload}</TableCell>
+                            <TableCell sx={MONO}>
+                              {fmt(r.uiCount)} / {fmt(TOTAL_EMPLOYEES)}
+                            </TableCell>
+                            <TableCell sx={MONO}>
+                              {fmt(r.actualCount)} {wrong ? '✗' : '✓'}
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              )}
+            </Paper>
 
-      {offerSelectAll ? (
-        <div className="bap-banner">
-          All {rows.length} employees on this page are selected.{' '}
-          <button type="button" className="bap-link" onClick={selectAllMatching} disabled={busy}>
-            Select all {fmt(totalCount)} employees matching your filters
-          </button>
-        </div>
-      ) : null}
+            <Divider />
 
-      {selection.scopes.length > 1 ? (
-        // Option D only. The banner has to describe the stack, not the last
-        // capture, because the count on screen is the sum of every capture.
-        <div className="bap-banner" data-tone="warn">
-          <b>{selection.scopes.length} select-alls are stacked:</b>{' '}
-          {selection.scopes.map((s) => s.label).join(' · ')}. The frontend adds their totals (
-          {selection.scopes.map((s) => fmt(s.total)).join(' + ')} ={' '}
-          {fmt(selection.scopes.reduce((n, sc) => n + sc.total, 0))}) and has no way to subtract anyone who matches more than one of them.{' '}
-          <button type="button" className="bap-link" onClick={clearSelection} disabled={busy}>
-            Clear selection
-          </button>
-        </div>
-      ) : activeScope && !selection.allInSystem ? (
-        <div className="bap-banner" data-tone={scopeIsCurrentFilter ? 'ok' : 'warn'}>
-          {scopeIsCurrentFilter ? (
-            <>
-              All {fmt(activeScope.total)} employees matching <b>{activeScope.label}</b> are selected
-              {selection.exclude.length
-                ? `, minus ${selection.exclude.length} excluded individually`
-                : ''}
-              .{' '}
-              <button type="button" className="bap-link" onClick={clearSelection} disabled={busy}>
-                Clear selection
-              </button>
-            </>
-          ) : (
-            <>
-              Select-all is held against <b>{activeScope.label}</b>, which is not the filter on
-              screen. The frontend cannot tell which of these rows that covers, so their checkboxes
-              read <span className="bap-inline-unknown">?</span>.{' '}
-              <button type="button" className="bap-link" onClick={selectAllMatching} disabled={busy}>
-                {strategy.onSecondSelectAll === 'stack'
-                  ? `Also select all ${fmt(totalCount)} matching this filter`
-                  : `Select all ${fmt(totalCount)} matching this filter instead`}
-              </button>
-            </>
-          )}
-        </div>
-      ) : null}
+            <Stack direction="row" spacing={2} alignItems="center" useFlexGap flexWrap="wrap">
+              <Button size="small" variant="outlined" onClick={resetAll} disabled={busy}>
+                Reset prototype
+              </Button>
+              <Typography variant="body2" color="text.secondary">
+                Mock backend, deterministic dataset, no network. Source:{' '}
+                <code>src/poc/bulk-action-pagination/</code>
+              </Typography>
+            </Stack>
+          </Stack>
+        </Container>
 
-      <EmployeeTable
-        rows={rowViews}
-        loading={loading}
-        pageState={pageState}
-        reveal={reveal}
-        disabled={busy}
-        onToggleRow={toggleRow}
-        onTogglePage={togglePage}
-      />
-
-      <Pagination
-        page={page}
-        pageCount={pageCount}
-        pageSize={pageSize}
-        total={totalCount}
-        disabled={busy}
-        onPage={setPage}
-        onPageSize={(s) => {
-          setPageSize(s);
-          setPage(1);
-        }}
-      />
-
-      <section className="bap-panel" aria-label="Payload sent to the backend">
-        <div className="bap-panel-title">Payload the frontend would submit</div>
-        <pre className="bap-code">{JSON.stringify(payload, null, 2)}</pre>
-        <p className="bap-muted-sm">
-          The backend resolves this to {fmt(actualCount)} employee{actualCount === 1 ? '' : 's'}: the
-          union of every filter above, plus <code>include</code>, minus <code>exclude</code>. The
-          frontend never sees that number before submitting — it shows {fmt(believedCount)}.
-        </p>
-      </section>
-
-      <section className="bap-panel" aria-label="Scenarios from the doc">
-        <div className="bap-panel-title">Replay the doc’s simulations</div>
-        <p className="bap-muted-sm">
-          Each one drives the controls above under the strategy you picked. Run the same scenario
-          under &ldquo;Option D&rdquo; and then under &ldquo;Proposal&rdquo; to see where the counts
-          part company.
-          {!strategy.offersSelectAll ? (
-            <>
-              {' '}
-              <b>
-                This strategy has no cross-page select-all, so the select-all steps do nothing and
-                the run ends at 0 — which is the honest answer for it.
-              </b>
-            </>
-          ) : null}
-          {strategy.id === 'global' ? (
-            <>
-              {' '}
-              <b>
-                This strategy ignores filters, so every select-all step selects all{' '}
-                {fmt(TOTAL_EMPLOYEES)} regardless of the scenario’s filters.
-              </b>
-            </>
-          ) : null}
-        </p>
-        <div className="bap-scenarios">
-          {SCENARIOS.map((s) => (
-            <div key={s.id} className="bap-scenario">
-              <div className="bap-scenario-head">
-                <span className="bap-scenario-ref">{s.docRef}</span>
-                <button
-                  type="button"
-                  className="bap-btn bap-btn-primary"
-                  disabled={busy}
-                  onClick={() => runScenario(s)}
-                >
-                  {running === s.id ? 'Running…' : 'Run'}
-                </button>
-              </div>
-              <div className="bap-scenario-title">{s.title}</div>
-              <p className="bap-muted-sm">{s.expectation}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="bap-panel" aria-label="Action log">
-        <div className="bap-panel-title">
-          Action log
-          {log.length ? (
-            <button type="button" className="bap-link" onClick={() => setLog([])}>
-              clear
-            </button>
-          ) : null}
-        </div>
-        {log.length === 0 ? (
-          <p className="bap-muted-sm">
-            Every action — filter, select-all, tick, untick — appends a row here, in the same
-            columns the doc’s simulation tables use.
-          </p>
-        ) : (
-          <div className="bap-log-wrap">
-            <table className="bap-table bap-log">
-              <thead>
-                <tr>
-                  <th scope="col">#</th>
-                  <th scope="col">Action</th>
-                  <th scope="col">BE return</th>
-                  <th scope="col">FE payload</th>
-                  <th scope="col">Count in UI</th>
-                  <th scope="col">Actually assigned</th>
-                </tr>
-              </thead>
-              <tbody>
-                {log.map((r) => {
-                  const wrong = r.uiCount !== r.actualCount;
-                  return (
-                    <tr key={r.n} data-wrong={wrong}>
-                      <td className="bap-muted">{r.n}</td>
-                      <td>{r.action}</td>
-                      <td className="bap-mono-sm">{r.beReturn}</td>
-                      <td className="bap-mono-sm">{r.fePayload}</td>
-                      <td className="bap-mono-sm">
-                        {fmt(r.uiCount)} / {fmt(TOTAL_EMPLOYEES)}
-                      </td>
-                      <td className="bap-mono-sm">
-                        {fmt(r.actualCount)} {wrong ? <span className="bap-truth-warn">✗</span> : '✓'}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </section>
-
-      <footer className="bap-foot">
-        <button type="button" className="bap-btn" onClick={resetAll} disabled={busy}>
-          Reset prototype
-        </button>
-        <span className="bap-muted-sm">
-          Mock backend, deterministic dataset, no network. Source: <code>src/poc/bulk-action-pagination/</code>
-        </span>
-      </footer>
-
-      {toast ? <Toast message={toast} onDismiss={() => setToast(null)} /> : null}
-    </main>
+        <Snackbar
+          open={toast !== null}
+          autoHideDuration={4000}
+          onClose={() => setToast(null)}
+          message={toast ?? ''}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        />
+      </ScopedCssBaseline>
+    </ThemeProvider>
   );
 }
+
+const MONO = { fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace', fontSize: 12, whiteSpace: 'pre-wrap' } as const;
 
 const wait = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
@@ -513,11 +476,11 @@ const wait = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 function formatPayload(p: ReturnType<typeof buildPayload>): string {
   if (!p.selectAll && p.include.length === 0) return '—';
   const parts: string[] = [];
-  if (p.selectAll) {
+  if (p.selectAll && p.filter) {
     parts.push('selectAll: true');
-    parts.push(`filter: [${p.filters.map((f) => describeFilters(f)).join('] [')}]`);
+    parts.push(`filter: [${describeFilters(p.filter)}]`);
   }
-  if (p.include.length) parts.push(`include: [${p.include.length}]`);
+  if (p.include.length) parts.push(`include: [${p.include.join(', ')}]`);
   if (p.exclude.length) parts.push(`exclude: [${p.exclude.join(', ')}]`);
   return parts.join('\n');
 }

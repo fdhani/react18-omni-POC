@@ -1,7 +1,12 @@
 import * as React from 'react';
 import { Link, Route, Routes } from 'react-router-dom';
 import App from './App';
-import BulkActionPaginationPoc from './poc/bulk-action-pagination/BulkActionPaginationPoc';
+
+// Lazily loaded: the prototype pulls in MUI, and the repro at "/" is a
+// measurement rig that should not be paying for another route's dependencies.
+const BulkActionPaginationPoc = React.lazy(
+  () => import('./poc/bulk-action-pagination/BulkActionPaginationPoc'),
+);
 
 /**
  * Route table.
@@ -16,11 +21,13 @@ export const POC_ROUTES: Array<{ path: string; title: string }> = [
 
 export function AppRoutes() {
   return (
-    <Routes>
-      <Route path="/" element={<App />} />
-      <Route path="/poc-bulk-action-pagination" element={<BulkActionPaginationPoc />} />
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+    <React.Suspense fallback={null}>
+      <Routes>
+        <Route path="/" element={<App />} />
+        <Route path="/poc-bulk-action-pagination" element={<BulkActionPaginationPoc />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </React.Suspense>
   );
 }
 

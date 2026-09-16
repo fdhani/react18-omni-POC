@@ -61,44 +61,38 @@ Deep links need the SPA fallback in `vercel.json` (`rewrites`), or
 
 ### `/poc-bulk-action-pagination`
 
-Simulates *Problem: Assign Employee with paginated select-all in Add
-Entitlement* (Notion, under Ad Hoc Time Off FE): 10,000 employees behind a
-paginated, combinably-filtered endpoint, where the browser holds one page and a
-`totalCount` and "select all" therefore has to be sent as intent rather than as
-a list of ids.
+Prototype of the Proposal in *Problem: Assign Employee with paginated
+select-all in Add Entitlement* (Notion, under Ad Hoc Time Off FE), built on MUI.
 
-Every option the doc weighs is implemented behind one switch, over one dataset,
-so the same clicks can be replayed under each:
+It is the Add Entitlement step-2 employee picker: 10,000 employees behind a
+paginated, combinably-filtered mock endpoint that only ever returns one page and
+a `totalCount`, so select-all has to be sent as intent rather than as a list of
+ids. The rules it implements are the doc's:
 
-| Switch | Doc |
-|---|---|
-| Proposal — one select-all, replaced each time | *Proposal* |
-| Gmail banner, reset on filter change | *Option A* / *Variant 2* |
-| Select all in system, filters ignored | *Variant 1* |
-| Current page only | *Option B* |
-| Filter-aware stacking | *Option D* — what we tried |
+- select-all captures the filter on screen, and the payload carries that filter
+  rather than the ids behind it;
+- select-alls never stack — clicking it again clears everything and captures the
+  current filter, so a count is never a sum of totals and nobody is counted
+  twice;
+- includes and excludes sit on top and survive paging.
 
-The mock backend can resolve the payload the frontend builds, so the count the
-UI believes is shown beside the count that would actually be assigned. The
-doc's three simulation tables are replayable buttons, and they reproduce:
+Alongside the picker the prototype shows the payload the frontend would submit
+and an action log in the doc's own columns (action, BE return, FE payload, count
+in UI), with one column the doc could only reason about: what the backend would
+actually assign for that payload. The doc's three Problem Simulation
+walkthroughs are replay buttons. Two of them are the sequences that miscounted
+when select-alls stacked; under the Proposal all three hold, the last step
+landing on 1,721 / 256 / 1,641 in both columns.
 
-- **stacking, overlapping filters** — UI 1,884, backend 1,628 (the 256 in both
-  filters are counted twice)
-- **stacking, exclusion across a filter change** — UI 3,268, backend 3,012
-- **the Proposal** — accurate on both, at the cost of rows whose checkbox the
-  frontend genuinely cannot resolve while you are on a filter other than the
-  captured one. Those render `?`, and "reveal backend truth" marks every row
-  where that guess is wrong.
+What the Proposal costs is visible in the table. Because the selection survives
+a filter change, a row's checkbox is genuinely unresolvable while the filter on
+screen is not the captured one — the frontend holds a filter and a count, not a
+membership list. Those rows render as indeterminate rather than as a confident
+tick, and the banner offers to re-capture the current filter. Closing that
+properly needs a product decision: render unknown, have the list endpoint return
+a per-row `selected` flag, or clear the selection on filter change.
 
-Installed with npm `overrides` to bypass the peer ranges of `react-sizeme` and
-`react-transition-group`, which do not declare React 18 support:
-
-```
-react-stack-grid@0.7.1          peer react: >=15.3.0
-  ├─ react-sizeme@2.6.12        peer react: ^0.14 || ^15 || ^16
-  │    └─ element-resize-detector@1.2.4   (scroll strategy, not ResizeObserver)
-  └─ react-transition-group@1.2.1  peer react: ^15 || ^16
-```
+The route is lazily loaded, so MUI stays out of the repro's bundle at `/`.
 
 ## Triggers
 

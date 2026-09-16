@@ -1,9 +1,13 @@
 /**
  * The three walkthroughs from the "Problem Simulation" section of the Notion
- * doc, as replayable scripts. Each one drives the real UI -- same reducer, same
- * mock endpoint -- and every step appends a row to the log, so the result is
- * the doc's table with two columns the doc could only reason about: the count
- * the frontend shows, and the count the backend would actually assign.
+ * doc, as replayable scripts. Each drives the real UI -- same reducer, same
+ * mock endpoint -- and every step appends a row to the log, giving back the
+ * doc's own table plus the column it could only reason about: what the backend
+ * would actually assign for the payload the frontend built.
+ *
+ * Two of the three are the sequences that went wrong when select-alls stacked.
+ * Under the Proposal they are where the "clear everything and capture the
+ * current filter" rule earns its keep.
  */
 import { EMPTY_FILTERS, type Filters } from './mockApi';
 
@@ -29,7 +33,7 @@ export const SCENARIOS: Scenario[] = [
     title: 'Select all with combinable filters (happy path)',
     docRef: '✅ Select all with combinable filters',
     expectation:
-      'Two select-alls over filters that share nobody. Adding the two totals happens to be right, which is exactly why the bug in the next scenario survives review.',
+      'Two select-alls over filters that share nobody. Stacking them would have given the right answer here — which is exactly why stacking looked safe. The Proposal keeps only the second, so the count is Finance’s total.',
     steps: [
       { label: 'Filter A — Department: Engineering', kind: 'filter', filters: filters({ departments: ['Engineering'] }) },
       { label: 'Select all in filter A result', kind: 'select-all' },
@@ -42,7 +46,7 @@ export const SCENARIOS: Scenario[] = [
     title: 'Select all with combinable filters (error)',
     docRef: '💥 Select all with combinable filters',
     expectation:
-      'The second filter is the first one narrowed, so its people are already selected. The frontend adds the two totalCounts anyway — it cannot know how much of A is inside A + B.',
+      'The second filter is the first one narrowed, so stacking would count the overlap twice: the frontend cannot know how much of A is inside A + B. Replacing instead of stacking makes the question unnecessary.',
     steps: [
       { label: 'Filter A — Department: Engineering', kind: 'filter', filters: filters({ departments: ['Engineering'] }) },
       { label: 'Select all in filter A result', kind: 'select-all' },
@@ -59,7 +63,7 @@ export const SCENARIOS: Scenario[] = [
     title: 'Exclusion with combinable filters (error)',
     docRef: '💥 Exclusion with combinable filters',
     expectation:
-      'An employee is excluded while filtered to their department, then the filter moves to a location. The exclusion rides along into a payload it was never meant for, and the frontend cannot tell whether it still applies.',
+      'An employee is excluded while filtered to their department, then the filter moves to a location and select-all is clicked again. Stacking would carry the exclusion into a payload it was never meant for; clearing on the second select-all drops it with the scope it belonged to.',
     steps: [
       { label: 'Filter — Department: Engineering', kind: 'filter', filters: filters({ departments: ['Engineering'] }) },
       { label: 'Select all in department result', kind: 'select-all' },

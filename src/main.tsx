@@ -1,7 +1,9 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { createRoot } from 'react-dom/client';
-import App, { CELL } from './App';
+import { BrowserRouter } from 'react-router-dom';
+import { CELL } from './App';
+import { AppRoutes } from './routes';
 import { probe } from './probe';
 
 const container = document.getElementById('root')!;
@@ -21,16 +23,26 @@ const MODE =
 (window as any).__probe = probe;
 probe.cell = CELL;
 probe.mode = MODE;
-probe.start();
+// The probe drives a permanent requestAnimationFrame loop and only means
+// anything on the repro route, so prototypes on other paths never start it.
+if (location.pathname === '/') probe.start();
+
+function Root() {
+  return (
+    <BrowserRouter>
+      <AppRoutes />
+    </BrowserRouter>
+  );
+}
 
 if (CELL === '2') {
-  (ReactDOM as any).render(<App />, container);
+  (ReactDOM as any).render(<Root />, container);
 } else if (CELL === '4') {
   createRoot(container).render(
     <React.StrictMode>
-      <App />
+      <Root />
     </React.StrictMode>,
   );
 } else {
-  createRoot(container).render(<App />);
+  createRoot(container).render(<Root />);
 }

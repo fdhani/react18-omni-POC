@@ -30,9 +30,29 @@ running React 17"*. Cell 2 vs cell 3 is therefore a direct isolation of
 ## Layout
 
 ```
-src/         app source (App, per-frame probe, entrypoint)
+src/         app source (App, per-frame probe, entrypoint, route table)
+src/poc/     standalone prototypes, one directory per route
 harness/     Playwright driver + offline analyzers (own package.json)
 ```
+
+## Routes
+
+`react-router-dom` `BrowserRouter`, wired in `src/main.tsx` inside whichever
+root the `?cell=` switch selected, so every prototype runs under the same three
+root configurations as the repro.
+
+| Path | What |
+|---|---|
+| `/` | The repro above. Still entirely query-string driven, so `harness/` is unaffected. |
+| `/poc-bulk-action-pagination` | Prototype: bulk actions over a paginated list. |
+
+Prototypes under `src/poc/` import nothing from the repro and own their state,
+styles and mock data, so they can be deleted or lifted out on their own. The
+per-frame probe starts only on `/` — it drives a permanent `requestAnimationFrame`
+loop and means nothing anywhere else.
+
+Deep links need the SPA fallback in `vercel.json` (`rewrites`), or
+`/poc-bulk-action-pagination` 404s on a hard refresh in production.
 
 A single Vite app at the repository root. It is deliberately **not** in a
 subdirectory: Vercel auto-detects a nested Vite app as the project Root

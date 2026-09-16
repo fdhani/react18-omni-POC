@@ -21,6 +21,7 @@ import {
   type EmployeeId,
   type Filters,
   type SelectionPayload,
+  type TaxYear,
   countMatching,
   describeFilters,
   filtersEqual,
@@ -44,7 +45,7 @@ export const EMPTY_SELECTION: SelectionState = { scope: null, include: [], exclu
 export type SelectionEvent =
   | { type: 'toggle-row'; id: EmployeeId; selected: boolean; underFilters: Filters }
   | { type: 'toggle-page'; ids: EmployeeId[]; selected: boolean; underFilters: Filters }
-  | { type: 'select-all-matching'; filters: Filters }
+  | { type: 'select-all-matching'; filters: Filters; year: TaxYear }
   | { type: 'clear' };
 
 const without = (list: EmployeeId[], id: EmployeeId) => list.filter((x) => x !== id);
@@ -88,7 +89,7 @@ export function reduce(state: SelectionState, event: SelectionEvent): SelectionS
       return {
         scope: {
           filters: event.filters,
-          total: countMatching(event.filters),
+          total: countMatching(event.filters, event.year),
           label: describeFilters(event.filters),
         },
         include: [],

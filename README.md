@@ -61,44 +61,58 @@ Deep links need the SPA fallback in `vercel.json` (`rewrites`), or
 
 ### `/poc-bulk-action-pagination`
 
-Prototype of the Proposal in *Problem: Assign Employee with paginated
-select-all in Add Entitlement* (Notion, under Ad Hoc Time Off FE), built on MUI.
+Prototype for **[PH-BIR-01 to 07] BIR 2316 Tax form generation** — the employee
+table for a tax year, where an admin publishes forms so employees can see them
+under Profile → Documents → Payroll Documents. Built on MUI.
 
-It is the Add Entitlement step-2 employee picker: 10,000 employees behind a
-paginated, combinably-filtered mock endpoint that only ever returns one page and
-a `totalCount`, so select-all has to be sent as intent rather than as a list of
-ids. The rules it implements are the doc's:
+It joins two problems:
 
-- select-all captures the filter on screen, and the payload carries that filter
-  rather than the ids behind it;
-- select-alls never stack — clicking it again clears everything and captures the
-  current filter, so a count is never a sum of totals and nobody is counted
-  twice;
-- includes and excludes sit on top and survive paging.
+**Selecting across pages.** 10,000 employees behind a paginated endpoint
+filterable by department, location and search. The browser holds one page and a
+`totalCount`, so select-all travels as intent, following the Proposal in
+*Problem: Assign Employee with paginated select-all in Add Entitlement*: one
+select-all, captured against the filter on screen, replaced wholesale by the
+next one, with includes and excludes on top. The doc's three Problem Simulation
+walkthroughs are replay buttons and still hold.
 
-Each row also carries a publish status — `published` or `unpublished` — and a
-kebab menu offering the one action that applies to it: Unpublish on a published
-row, Publish on an unpublished one, never both and never a disabled no-op. The
-change goes through the mock backend and the row is patched with what comes
-back, rather than refetching the page: a refetch would flash the table for a
-one-field change and could reshuffle rows under someone midway through ticking
-them. Publishing never touches the selection.
+**Acting on only the eligible rows.** Publish applies only to a form that is
+generated, complete and not yet published (PH-BIR-06.1), so a row is in one of
+four states and the count the admin needs is not the count they selected:
 
-Alongside the picker the prototype shows the payload the frontend would submit
-and an action log in the doc's own columns (action, BE return, FE payload, count
-in UI), with one column the doc could only reason about: what the backend would
-actually assign for that payload. The doc's three Problem Simulation
-walkthroughs are replay buttons. Two of them are the sequences that miscounted
-when select-alls stacked; under the Proposal all three hold, the last step
-landing on 1,673 / 303 / 1,731 in both columns.
+| Row state | Publish | Unpublish |
+|---|---|---|
+| Not generated | — | — |
+| Generated, missing mandatory info | blocked, with the reason | — |
+| Generated, complete, unpublished | ✓ | — |
+| Published | — | ✓ |
 
-What the Proposal costs is visible in the table. Because the selection survives
-a filter change, a row's checkbox is genuinely unresolvable while the filter on
-screen is not the captured one — the frontend holds a filter and a count, not a
-membership list. Those rows render as indeterminate rather than as a confident
-tick, and the banner offers to re-capture the current filter. Closing that
-properly needs a product decision: render unknown, have the list endpoint return
-a per-row `selected` flag, or clear the selection on filter change.
+The frontend cannot compute those buckets — it has never fetched most of the
+rows — so they come from the backend and are shown **in the bulk menu itself**:
+
+```
+Bulk actions ▾   Publish        8,955 unpublished
+                 Unpublish      nothing published in this selection   (disabled)
+                 ──────────────────────────────────────────────
+                 1,045 selected forms cannot be published —
+                 missing information.   [ Show them ]
+```
+
+"Show them" filters the table to exactly those rows, keeping the selection, so
+the dead end becomes the next task. The confirm dialog repeats the breakdown,
+and the result reports what actually happened rather than what was forecast —
+eligibility is decided at execution time against live state.
+
+Also modelled: the one global *Generate forms* action and *Reset all*
+(PH-BIR-01.5), a per-row kebab offering the single action that applies, and a
+tax-year switch, which is a hard reset of the selection rather than a filter
+change.
+
+What the prototype leaves out, deliberately: publish/unpublish is synchronous
+(at 10,000 rows production would need a job — the Rostering RFC's
+`bulkprocessingjobs` + Celery pattern is the obvious model), employer-level
+missing information does not block the page (PH-BIR-02), and there is no
+download-ZIP action (PH-BIR-05.2) even though it would share this selection
+model.
 
 The route is lazily loaded, so MUI stays out of the repro's bundle at `/`.
 

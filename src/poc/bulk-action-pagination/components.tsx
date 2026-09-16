@@ -2,12 +2,16 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import Checkbox from '@mui/material/Checkbox';
 import Chip from '@mui/material/Chip';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import IconButton from '@mui/material/IconButton';
 import LinearProgress from '@mui/material/LinearProgress';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
+import Switch from '@mui/material/Switch';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -23,16 +27,13 @@ import { visuallyHidden } from '@mui/utils';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import PublishIcon from '@mui/icons-material/Publish';
 import UnpublishedIcon from '@mui/icons-material/UnpublishedOutlined';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
 
 import {
   DEPARTMENTS,
-  EMPLOYMENT_TYPES,
   LOCATIONS,
-  type Employee,
+  type EmployeeRow,
   type Filters,
-  type PublishStatus,
+  type FormStatus,
 } from './mockApi';
 import type { PageCheckState, RowCheckState } from './selection';
 
@@ -41,11 +42,6 @@ export const fmt = (n: number) => n.toLocaleString('en-US');
 const UNKNOWN_HELP =
   'A select-all is in force for a different filter. The frontend holds that filter and its total count, not the list of ids behind it, so it cannot tell whether this row is inside the selection.';
 
-/**
- * Row checkbox. `unknown` is the honest third state: shown indeterminate in
- * warning colour rather than as a confident tick, because the frontend really
- * does not know. Clicking it resolves the ambiguity by excluding the row.
- */
 export function RowCheckbox({
   state,
   onChange,
@@ -83,6 +79,59 @@ export function RowCheckbox({
     />
   );
 }
+
+// ------------------------------------------------------------ status of a row ---
+
+const STATUS_LABEL: Record<FormStatus, string> = {
+  not_generated: 'Not generated',
+  missing_info: 'Missing info',
+  unpublished: 'Unpublished',
+  published: 'Published',
+};
+
+export function StatusChip({ row }: { row: EmployeeRow }) {
+  if (row.status === 'missing_info') {
+    return (
+      <Tooltip title={`Missing: ${row.missingFields.join(', ')}`}>
+        <Chip size="small" color="warning" variant="outlined" label={STATUS_LABEL.missing_info} />
+      </Tooltip>
+    );
+  }
+  return (
+    <Chip
+      size="small"
+      label={STATUS_LABEL[row.status]}
+      color={row.status === 'published' ? 'success' : 'default'}
+      variant={row.status === 'published' ? 'filled' : 'outlined'}
+    />
+  );
+}
+
+/**
+ * The one action a row can take, and why it cannot take one.
+ *
+ * Publishing is only possible for a generated, complete, unpublished form
+ * (PH-BIR-06.1). Rather than offering a Publish that fails, the menu item is
+ * disabled and carries the reason.
+ */
+export function rowAction(row: EmployeeRow):
+  | { kind: 'publish'; enabled: true }
+  | { kind: 'unpublish'; enabled: true }
+  | { kind: 'publish'; enabled: false; reason: string } {
+  switch (row.status) {
+    case 'published':
+      return { kind: 'unpublish', enabled: true };
+    case 'unpublished':
+      return { kind: 'publish', enabled: true };
+    case 'missing_info':
+      return { kind: 'publish', enabled: false, reason: `Missing ${row.missingFields.join(', ')}` };
+    case 'not_generated':
+    default:
+      return { kind: 'publish', enabled: false, reason: 'Form not generated for this tax year' };
+  }
+}
+
+// ------------------------------------------------------------------- filters ---
 
 function FilterGroup({
   title,
@@ -139,7 +188,7 @@ export function FilterBar({
         sx={{
           display: 'grid',
           gap: 2,
-          gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(4, 1fr)' },
+          gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' },
         }}
       >
         <FilterGroup
@@ -156,13 +205,6 @@ export function FilterBar({
           disabled={disabled}
           onChange={(locations) => onChange({ ...filters, locations })}
         />
-        <FilterGroup
-          title="Employment type"
-          options={EMPLOYMENT_TYPES}
-          selected={filters.employmentTypes}
-          disabled={disabled}
-          onChange={(employmentTypes) => onChange({ ...filters, employmentTypes })}
-        />
         <Box>
           <Typography variant="overline" color="text.secondary" display="block">
             Search
@@ -176,25 +218,32 @@ export function FilterBar({
             disabled={disabled}
             onChange={(e) => onChange({ ...filters, search: e.target.value })}
           />
+          <FormControlLabel
+            sx={{ mt: 0.5 }}
+            control={
+              <Switch
+                size="small"
+                checked={filters.missingInfoOnly}
+                disabled={disabled}
+                onChange={(e) => onChange({ ...filters, missingInfoOnly: e.target.checked })}
+              />
+            }
+            label={
+              <Typography variant="body2" color="text.secondary">
+                Missing info only
+              </Typography>
+            }
+          />
         </Box>
       </Box>
     </Paper>
   );
 }
 
-export function StatusChip({ status }: { status: PublishStatus }) {
-  return (
-    <Chip
-      size="small"
-      label={status === 'published' ? 'Published' : 'Unpublished'}
-      color={status === 'published' ? 'success' : 'default'}
-      variant={status === 'published' ? 'filled' : 'outlined'}
-    />
-  );
-}
+// ---------------------------------------------------------------------- table ---
 
 export type RowView = {
-  employee: Employee;
+  employee: EmployeeRow;
   state: RowCheckState;
 };
 
@@ -203,25 +252,25 @@ export function EmployeeTable({
   loading,
   pageState,
   disabled,
-  pendingStatusId,
+  pendingRowId,
   onToggleRow,
   onTogglePage,
-  onSetStatus,
+  onSetPublished,
 }: {
   rows: RowView[];
   loading: boolean;
   pageState: PageCheckState;
   disabled?: boolean;
-  /** Row whose publish/unpublish is in flight, so its menu cannot be fired twice. */
-  pendingStatusId: string | null;
+  pendingRowId: string | null;
   onToggleRow: (id: string, checked: boolean) => void;
   onTogglePage: (checked: boolean) => void;
-  onSetStatus: (id: string, status: PublishStatus) => void;
+  onSetPublished: (id: string, published: boolean) => void;
 }) {
-  // One menu for the table, re-anchored per row: 25 mounted Menus would be 25
-  // popovers in the tree for one that can be open at a time.
-  const [menu, setMenu] = React.useState<{ anchor: HTMLElement; employee: Employee } | null>(null);
+  // One menu for the table, re-anchored per row: 25 mounted popovers for the
+  // one that can be open at a time would be waste.
+  const [menu, setMenu] = React.useState<{ anchor: HTMLElement; row: EmployeeRow } | null>(null);
   const closeMenu = () => setMenu(null);
+  const action = menu ? rowAction(menu.row) : null;
 
   return (
     <TableContainer component={Paper} variant="outlined" sx={{ position: 'relative' }}>
@@ -242,8 +291,8 @@ export function EmployeeTable({
             <TableCell>Employee</TableCell>
             <TableCell>Department</TableCell>
             <TableCell>Location</TableCell>
-            <TableCell>Type</TableCell>
-            <TableCell>Status</TableCell>
+            <TableCell>TIN</TableCell>
+            <TableCell>Form status</TableCell>
             <TableCell align="right" sx={{ width: 56 }}>
               <Box component="span" sx={visuallyHidden}>
                 Actions
@@ -283,22 +332,24 @@ export function EmployeeTable({
                   {employee.name}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
-                  {employee.id} · {employee.jobTitle}
+                  {employee.id}
                 </Typography>
               </TableCell>
               <TableCell>{employee.department}</TableCell>
               <TableCell>{employee.location}</TableCell>
-              <TableCell>{employee.employmentType}</TableCell>
+              <TableCell sx={{ fontVariantNumeric: 'tabular-nums' }}>
+                {employee.tin ?? <Typography variant="caption" color="warning.main">missing</Typography>}
+              </TableCell>
               <TableCell>
-                <StatusChip status={employee.status} />
+                <StatusChip row={employee} />
               </TableCell>
               <TableCell align="right">
                 <IconButton
                   size="small"
-                  disabled={disabled || pendingStatusId === employee.id}
+                  disabled={disabled || pendingRowId === employee.id}
                   aria-label={`Actions for ${employee.name}`}
                   aria-haspopup="menu"
-                  onClick={(e) => setMenu({ anchor: e.currentTarget, employee })}
+                  onClick={(e) => setMenu({ anchor: e.currentTarget, row: employee })}
                 >
                   <MoreVertIcon fontSize="small" />
                 </IconButton>
@@ -309,28 +360,25 @@ export function EmployeeTable({
       </Table>
 
       <Menu anchorEl={menu?.anchor ?? null} open={menu !== null} onClose={closeMenu}>
-        {/* Only the action that can apply is offered: published rows can be
-            unpublished and vice versa, so there is never a disabled no-op. */}
-        {menu ? (
+        {menu && action ? (
           <MenuItem
+            disabled={!action.enabled}
             onClick={() => {
-              onSetStatus(
-                menu.employee.id,
-                menu.employee.status === 'published' ? 'unpublished' : 'published',
-              );
+              onSetPublished(menu.row.id, action.kind === 'publish');
               closeMenu();
             }}
           >
             <ListItemIcon>
-              {menu.employee.status === 'published' ? (
-                <UnpublishedIcon fontSize="small" />
-              ) : (
+              {action.kind === 'publish' ? (
                 <PublishIcon fontSize="small" />
+              ) : (
+                <UnpublishedIcon fontSize="small" />
               )}
             </ListItemIcon>
-            <ListItemText>
-              {menu.employee.status === 'published' ? 'Unpublish' : 'Publish'}
-            </ListItemText>
+            <ListItemText
+              primary={action.kind === 'publish' ? 'Publish' : 'Unpublish'}
+              secondary={action.enabled ? undefined : action.reason}
+            />
           </MenuItem>
         ) : null}
       </Menu>

@@ -35,6 +35,11 @@ src/poc/     standalone prototypes, one directory per route
 harness/     Playwright driver + offline analyzers (own package.json)
 ```
 
+A single Vite app at the repository root. It is deliberately **not** in a
+subdirectory: Vercel auto-detects a nested Vite app as the project Root
+Directory, which silently changes which `package.json` its build command runs
+against.
+
 ## Routes
 
 `react-router-dom` `BrowserRouter`, wired in `src/main.tsx` inside whichever
@@ -44,7 +49,7 @@ root configurations as the repro.
 | Path | What |
 |---|---|
 | `/` | The repro above. Still entirely query-string driven, so `harness/` is unaffected. |
-| `/poc-bulk-action-pagination` | Prototype: bulk actions over a paginated list. |
+| `/poc-bulk-action-pagination` | Prototype: paginated select-all in Add Entitlement (see below). |
 
 Prototypes under `src/poc/` import nothing from the repro and own their state,
 styles and mock data, so they can be deleted or lifted out on their own. The
@@ -54,10 +59,36 @@ loop and means nothing anywhere else.
 Deep links need the SPA fallback in `vercel.json` (`rewrites`), or
 `/poc-bulk-action-pagination` 404s on a hard refresh in production.
 
-A single Vite app at the repository root. It is deliberately **not** in a
-subdirectory: Vercel auto-detects a nested Vite app as the project Root
-Directory, which silently changes which `package.json` its build command runs
-against.
+### `/poc-bulk-action-pagination`
+
+Simulates *Problem: Assign Employee with paginated select-all in Add
+Entitlement* (Notion, under Ad Hoc Time Off FE): 10,000 employees behind a
+paginated, combinably-filtered endpoint, where the browser holds one page and a
+`totalCount` and "select all" therefore has to be sent as intent rather than as
+a list of ids.
+
+Every option the doc weighs is implemented behind one switch, over one dataset,
+so the same clicks can be replayed under each:
+
+| Switch | Doc |
+|---|---|
+| Proposal — one select-all, replaced each time | *Proposal* |
+| Gmail banner, reset on filter change | *Option A* / *Variant 2* |
+| Select all in system, filters ignored | *Variant 1* |
+| Current page only | *Option B* |
+| Filter-aware stacking | *Option D* — what we tried |
+
+The mock backend can resolve the payload the frontend builds, so the count the
+UI believes is shown beside the count that would actually be assigned. The
+doc's three simulation tables are replayable buttons, and they reproduce:
+
+- **stacking, overlapping filters** — UI 1,884, backend 1,628 (the 256 in both
+  filters are counted twice)
+- **stacking, exclusion across a filter change** — UI 3,268, backend 3,012
+- **the Proposal** — accurate on both, at the cost of rows whose checkbox the
+  frontend genuinely cannot resolve while you are on a filter other than the
+  captured one. Those render `?`, and "reveal backend truth" marks every row
+  where that guess is wrong.
 
 Installed with npm `overrides` to bypass the peer ranges of `react-sizeme` and
 `react-transition-group`, which do not declare React 18 support:

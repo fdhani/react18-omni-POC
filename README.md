@@ -30,7 +30,8 @@ running React 17"*. Cell 2 vs cell 3 is therefore a direct isolation of
 ## Layout
 
 ```
-src/         app source (App, per-frame probe, entrypoint)
+src/         app source (App, per-frame probe, entrypoint, route table)
+src/poc/     standalone prototypes, one directory per route
 harness/     Playwright driver + offline analyzers (own package.json)
 ```
 
@@ -39,15 +40,81 @@ subdirectory: Vercel auto-detects a nested Vite app as the project Root
 Directory, which silently changes which `package.json` its build command runs
 against.
 
-Installed with npm `overrides` to bypass the peer ranges of `react-sizeme` and
-`react-transition-group`, which do not declare React 18 support:
+## Routes
+
+`react-router-dom` `BrowserRouter`, wired in `src/main.tsx` inside whichever
+root the `?cell=` switch selected, so every prototype runs under the same three
+root configurations as the repro.
+
+| Path | What |
+|---|---|
+| `/` | The repro above. Still entirely query-string driven, so `harness/` is unaffected. |
+| `/poc-bulk-action-pagination` | Prototype: paginated select-all in Add Entitlement (see below). |
+
+Prototypes under `src/poc/` import nothing from the repro and own their state,
+styles and mock data, so they can be deleted or lifted out on their own. The
+per-frame probe starts only on `/` — it drives a permanent `requestAnimationFrame`
+loop and means nothing anywhere else.
+
+Deep links need the SPA fallback in `vercel.json` (`rewrites`), or
+`/poc-bulk-action-pagination` 404s on a hard refresh in production.
+
+### `/poc-bulk-action-pagination`
+
+Prototype for **[PH-BIR-01 to 07] BIR 2316 Tax form generation** — the employee
+table for a tax year, where an admin publishes forms so employees can see them
+under Profile → Documents → Payroll Documents. Built on MUI.
+
+It joins two problems:
+
+**Selecting across pages.** 10,000 employees behind a paginated endpoint
+filterable by department, location and search. The browser holds one page and a
+`totalCount`, so select-all travels as intent, following the Proposal in
+*Problem: Assign Employee with paginated select-all in Add Entitlement*: one
+select-all, captured against the filter on screen, replaced wholesale by the
+next one, with includes and excludes on top. The doc's three Problem Simulation
+walkthroughs are replay buttons and still hold.
+
+**Acting on only the eligible rows.** Publish applies only to a form that is
+generated, complete and not yet published (PH-BIR-06.1), so a row is in one of
+four states and the count the admin needs is not the count they selected:
+
+| Row state | Publish | Unpublish |
+|---|---|---|
+| Not generated | — | — |
+| Generated, missing mandatory info | blocked, with the reason | — |
+| Generated, complete, unpublished | ✓ | — |
+| Published | — | ✓ |
+
+The frontend cannot compute those buckets — it has never fetched most of the
+rows — so they come from the backend and are shown **in the bulk menu itself**:
 
 ```
-react-stack-grid@0.7.1          peer react: >=15.3.0
-  ├─ react-sizeme@2.6.12        peer react: ^0.14 || ^15 || ^16
-  │    └─ element-resize-detector@1.2.4   (scroll strategy, not ResizeObserver)
-  └─ react-transition-group@1.2.1  peer react: ^15 || ^16
+Bulk actions ▾   Publish        8,955 unpublished
+                 Unpublish      nothing published in this selection   (disabled)
+                 ──────────────────────────────────────────────
+                 1,045 selected forms cannot be published —
+                 missing information.   [ Show them ]
 ```
+
+"Show them" filters the table to exactly those rows, keeping the selection, so
+the dead end becomes the next task. The confirm dialog repeats the breakdown,
+and the result reports what actually happened rather than what was forecast —
+eligibility is decided at execution time against live state.
+
+Also modelled: the one global *Generate forms* action and *Reset all*
+(PH-BIR-01.5), a per-row kebab offering the single action that applies, and a
+tax-year switch, which is a hard reset of the selection rather than a filter
+change.
+
+What the prototype leaves out, deliberately: publish/unpublish is synchronous
+(at 10,000 rows production would need a job — the Rostering RFC's
+`bulkprocessingjobs` + Celery pattern is the obvious model), employer-level
+missing information does not block the page (PH-BIR-02), and there is no
+download-ZIP action (PH-BIR-05.2) even though it would share this selection
+model.
+
+The route is lazily loaded, so MUI stays out of the repro's bundle at `/`.
 
 ## Triggers
 

@@ -25,11 +25,13 @@ import {
   EMPTY_FILTERS,
   type Employee,
   type Filters,
+  type PublishStatus,
   TOTAL_EMPLOYEES,
   countMatching,
   describeFilters,
   fetchEmployees,
   resolveSelection,
+  setPublishStatus,
 } from './mockApi';
 import {
   EMPTY_SELECTION,
@@ -68,6 +70,7 @@ export default function BulkActionPaginationPoc() {
   const [totalCount, setTotalCount] = React.useState(TOTAL_EMPLOYEES);
   const [loading, setLoading] = React.useState(true);
 
+  const [pendingStatusId, setPendingStatusId] = React.useState<string | null>(null);
   const [log, setLog] = React.useState<LogRow[]>([]);
   const [toast, setToast] = React.useState<string | null>(null);
   const [running, setRunning] = React.useState<string | null>(null);
@@ -152,6 +155,23 @@ export default function BulkActionPaginationPoc() {
   };
 
   const clearSelection = () => apply(reduce(selection, { type: 'clear' }), 'Clear selection', filters);
+
+  /**
+   * Publish / unpublish one row from its kebab menu. Patches the row in place
+   * with what the backend returned rather than refetching the page: a refetch
+   * would flash the whole table for a one-field change, and could shuffle rows
+   * under a user who is midway through ticking them.
+   */
+  const changeStatus = async (id: string, status: PublishStatus) => {
+    setPendingStatusId(id);
+    try {
+      const updated = await setPublishStatus(id, status);
+      setRows((prev) => prev.map((r) => (r.id === id ? updated : r)));
+      setToast(`${updated.name} ${status === 'published' ? 'published' : 'unpublished'}`);
+    } finally {
+      setPendingStatusId(null);
+    }
+  };
 
   const resetAll = () => {
     setSelection(EMPTY_SELECTION);
@@ -300,8 +320,10 @@ export default function BulkActionPaginationPoc() {
                 loading={loading}
                 pageState={pageState}
                 disabled={busy}
+                pendingStatusId={pendingStatusId}
                 onToggleRow={toggleRow}
                 onTogglePage={togglePage}
+                onSetStatus={changeStatus}
               />
               <TablePagination
                 component="div"

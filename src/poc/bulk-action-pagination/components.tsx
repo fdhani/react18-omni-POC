@@ -2,7 +2,10 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import Checkbox from '@mui/material/Checkbox';
 import Chip from '@mui/material/Chip';
+import IconButton from '@mui/material/IconButton';
 import LinearProgress from '@mui/material/LinearProgress';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import Table from '@mui/material/Table';
@@ -15,8 +18,22 @@ import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { alpha } from '@mui/material/styles';
+import { visuallyHidden } from '@mui/utils';
 
-import { DEPARTMENTS, EMPLOYMENT_TYPES, LOCATIONS, type Employee, type Filters } from './mockApi';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import PublishIcon from '@mui/icons-material/Publish';
+import UnpublishedIcon from '@mui/icons-material/UnpublishedOutlined';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+
+import {
+  DEPARTMENTS,
+  EMPLOYMENT_TYPES,
+  LOCATIONS,
+  type Employee,
+  type Filters,
+  type PublishStatus,
+} from './mockApi';
 import type { PageCheckState, RowCheckState } from './selection';
 
 export const fmt = (n: number) => n.toLocaleString('en-US');
@@ -165,6 +182,17 @@ export function FilterBar({
   );
 }
 
+export function StatusChip({ status }: { status: PublishStatus }) {
+  return (
+    <Chip
+      size="small"
+      label={status === 'published' ? 'Published' : 'Unpublished'}
+      color={status === 'published' ? 'success' : 'default'}
+      variant={status === 'published' ? 'filled' : 'outlined'}
+    />
+  );
+}
+
 export type RowView = {
   employee: Employee;
   state: RowCheckState;
@@ -175,16 +203,26 @@ export function EmployeeTable({
   loading,
   pageState,
   disabled,
+  pendingStatusId,
   onToggleRow,
   onTogglePage,
+  onSetStatus,
 }: {
   rows: RowView[];
   loading: boolean;
   pageState: PageCheckState;
   disabled?: boolean;
+  /** Row whose publish/unpublish is in flight, so its menu cannot be fired twice. */
+  pendingStatusId: string | null;
   onToggleRow: (id: string, checked: boolean) => void;
   onTogglePage: (checked: boolean) => void;
+  onSetStatus: (id: string, status: PublishStatus) => void;
 }) {
+  // One menu for the table, re-anchored per row: 25 mounted Menus would be 25
+  // popovers in the tree for one that can be open at a time.
+  const [menu, setMenu] = React.useState<{ anchor: HTMLElement; employee: Employee } | null>(null);
+  const closeMenu = () => setMenu(null);
+
   return (
     <TableContainer component={Paper} variant="outlined" sx={{ position: 'relative' }}>
       {loading ? <LinearProgress sx={{ position: 'absolute', inset: '0 0 auto', height: 2 }} /> : null}
@@ -205,12 +243,18 @@ export function EmployeeTable({
             <TableCell>Department</TableCell>
             <TableCell>Location</TableCell>
             <TableCell>Type</TableCell>
+            <TableCell>Status</TableCell>
+            <TableCell align="right" sx={{ width: 56 }}>
+              <Box component="span" sx={visuallyHidden}>
+                Actions
+              </Box>
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {rows.length === 0 && !loading ? (
             <TableRow>
-              <TableCell colSpan={5} align="center" sx={{ py: 6, color: 'text.secondary' }}>
+              <TableCell colSpan={7} align="center" sx={{ py: 6, color: 'text.secondary' }}>
                 No employees match these filters.
               </TableCell>
             </TableRow>
@@ -245,10 +289,51 @@ export function EmployeeTable({
               <TableCell>{employee.department}</TableCell>
               <TableCell>{employee.location}</TableCell>
               <TableCell>{employee.employmentType}</TableCell>
+              <TableCell>
+                <StatusChip status={employee.status} />
+              </TableCell>
+              <TableCell align="right">
+                <IconButton
+                  size="small"
+                  disabled={disabled || pendingStatusId === employee.id}
+                  aria-label={`Actions for ${employee.name}`}
+                  aria-haspopup="menu"
+                  onClick={(e) => setMenu({ anchor: e.currentTarget, employee })}
+                >
+                  <MoreVertIcon fontSize="small" />
+                </IconButton>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
+
+      <Menu anchorEl={menu?.anchor ?? null} open={menu !== null} onClose={closeMenu}>
+        {/* Only the action that can apply is offered: published rows can be
+            unpublished and vice versa, so there is never a disabled no-op. */}
+        {menu ? (
+          <MenuItem
+            onClick={() => {
+              onSetStatus(
+                menu.employee.id,
+                menu.employee.status === 'published' ? 'unpublished' : 'published',
+              );
+              closeMenu();
+            }}
+          >
+            <ListItemIcon>
+              {menu.employee.status === 'published' ? (
+                <UnpublishedIcon fontSize="small" />
+              ) : (
+                <PublishIcon fontSize="small" />
+              )}
+            </ListItemIcon>
+            <ListItemText>
+              {menu.employee.status === 'published' ? 'Unpublish' : 'Publish'}
+            </ListItemText>
+          </MenuItem>
+        ) : null}
+      </Menu>
     </TableContainer>
   );
 }

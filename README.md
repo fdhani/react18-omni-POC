@@ -76,13 +76,21 @@ ids. The rules it implements are the doc's:
   twice;
 - includes and excludes sit on top and survive paging.
 
+Each row also carries a publish status — `published` or `unpublished` — and a
+kebab menu offering the one action that applies to it: Unpublish on a published
+row, Publish on an unpublished one, never both and never a disabled no-op. The
+change goes through the mock backend and the row is patched with what comes
+back, rather than refetching the page: a refetch would flash the table for a
+one-field change and could reshuffle rows under someone midway through ticking
+them. Publishing never touches the selection.
+
 Alongside the picker the prototype shows the payload the frontend would submit
 and an action log in the doc's own columns (action, BE return, FE payload, count
 in UI), with one column the doc could only reason about: what the backend would
 actually assign for that payload. The doc's three Problem Simulation
 walkthroughs are replay buttons. Two of them are the sequences that miscounted
 when select-alls stacked; under the Proposal all three hold, the last step
-landing on 1,721 / 256 / 1,641 in both columns.
+landing on 1,673 / 303 / 1,731 in both columns.
 
 What the Proposal costs is visible in the table. Because the selection survives
 a filter change, a row's checkbox is genuinely unresolvable while the filter on

@@ -15,6 +15,9 @@
 
 export type EmployeeId = string;
 
+/** Publication state of a row. Exactly two values, toggled from the row's kebab menu. */
+export type PublishStatus = 'published' | 'unpublished';
+
 export type Employee = {
   id: EmployeeId;
   name: string;
@@ -23,6 +26,7 @@ export type Employee = {
   location: string;
   employmentType: string;
   jobTitle: string;
+  status: PublishStatus;
 };
 
 export const DEPARTMENTS = [
@@ -131,6 +135,7 @@ const EMPLOYEES: Employee[] = (() => {
       location: LOCATIONS[Math.floor(rand() * LOCATIONS.length)],
       employmentType: EMPLOYMENT_TYPES[Math.floor(rand() * EMPLOYMENT_TYPES.length)],
       jobTitle: TITLES[Math.floor(rand() * TITLES.length)],
+      status: rand() < 0.7 ? 'published' : 'unpublished',
     });
   }
   return rows;
@@ -174,7 +179,9 @@ export async function fetchEmployees(
   return {
     page: clamped,
     pageSize,
-    employees: all.slice(start, start + pageSize),
+    // Copies: the caller holds these across mutations, and a shared reference
+    // would let a later publish/unpublish change rows behind its back.
+    employees: all.slice(start, start + pageSize).map((e) => ({ ...e })),
     totalCount: all.length,
   };
 }
@@ -182,6 +189,22 @@ export async function fetchEmployees(
 /** Synchronous count, used to fill in the `totalCount` a select-all click captures. */
 export function countMatching(filters: Filters): number {
   return EMPLOYEES.reduce((n, e) => (matches(e, filters) ? n + 1 : n), 0);
+}
+
+/**
+ * Publish or unpublish one employee. The backend is the source of truth for the
+ * new state, so the caller takes what comes back rather than assuming its own
+ * optimistic value stuck.
+ */
+export async function setPublishStatus(
+  id: EmployeeId,
+  status: PublishStatus,
+): Promise<Employee> {
+  await sleep(LATENCY_MS);
+  const live = EMPLOYEES.find((e) => e.id === id);
+  if (!live) throw new Error(`no such employee: ${id}`);
+  live.status = status;
+  return { ...live };
 }
 
 // ------------------------------------------------ the payload, and its truth ---
